@@ -6,7 +6,7 @@ package UDP;
 public class Main {
   public static void main(String[] args) throws Exception {
 
-    UDPclient udPclient1 = new UDPclient(7777,1024);
+    UDPclient udPclient1 = new UDPclient(7777,10);
     udPclient1.connect();
 
   }

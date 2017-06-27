@@ -32,19 +32,19 @@ public class UDPserver {
       while(true)
       {
         socket.receive(incomingPacket);
-        System.out.println("Incoming Address :"+incomingPacket.getAddress());
-        System.out.println("Incoming Port :"+incomingPacket.getPort());
+//        System.out.println("Incoming Address :"+incomingPacket.getAddress());
+//        System.out.println("Incoming Port :"+incomingPacket.getPort());
         byte[] data = incomingPacket.getData();
         String msg = new String(data,0,data.length);
         System.out.println(msg);
 
-        msg = "Received : " + msg;
-        byte[] reply = msg.getBytes();
-        InetAddress outgoingAddress = incomingPacket.getAddress();
-        int outgoingPort = incomingPacket.getPort();
+//        msg = "Received : " + msg;
+//        byte[] reply = msg.getBytes();
+//        InetAddress outgoingAddress = incomingPacket.getAddress();
+//        int outgoingPort = incomingPacket.getPort();
 
-        DatagramPacket outgoingDatagram = new DatagramPacket(reply , reply.length , outgoingAddress,outgoingPort );
-        socket.send(outgoingDatagram);
+//        DatagramPacket outgoingDatagram = new DatagramPacket(reply , reply.length , outgoingAddress,outgoingPort );
+//        socket.send(outgoingDatagram);
       }
 
   }
