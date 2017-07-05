@@ -10,13 +10,13 @@ import java.net.InetAddress;
  * Created by AdminPC on 7/4/2017.
  */
 public class ClientSend extends Thread {
-  private InetAddress hostAddr;
+  private static InetAddress hostAddr;
   private int bufferSize;
-  private DatagramSocket datagramSocket;
-  private DatagramPacket datagramPacket;
+  private static DatagramSocket datagramSocket;
+  private static DatagramPacket datagramPacket;
   private String msg;
   BufferedReader BR;
-  private byte[] msgByteArray;
+  private static byte[] msgByteArray;
 
   ClientSend(InetAddress hostAd, int buffSize, DatagramSocket dsoc){
     hostAddr = hostAd;
@@ -37,11 +37,13 @@ public class ClientSend extends Thread {
           String seq = MakeConstantDigits(UDPclient.seqNumber);
           String len = MakeConstantDigits(msg.length());
           if ((seq != null) && (seq.length() == 6) && (len != null) && (len.length() == 6)) {
+            UDPclient.waitingForAckDataBuffer.put(UDPclient.seqNumber,msg);
             msg = UDPclient.sessionID + "#seq#" + seq + "#len#" + len + "#msg#" + msg;
 
             msgByteArray = msg.getBytes();
             datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, hostAddr, UDPclient.portToBeConnected);
             datagramSocket.send(datagramPacket);
+
           } else {
             System.out.println("seq num / length is not in correct format");
           }
@@ -50,11 +52,11 @@ public class ClientSend extends Thread {
           System.out.println("data is too long for the buffer");
         }
       } catch (Exception ex) {
-
+        //
       }
     }
   }
-  private String MakeConstantDigits(int num){
+  private static String MakeConstantDigits(int num){
     String str = Integer.toString(num);
 
     switch(str.length()) {
@@ -79,6 +81,22 @@ public class ClientSend extends Thread {
       default :
         System.out.println(str);
         return (null);
+    }
+  }
+  public static void SendData(int seqNum,String msg) throws Exception{
+    System.out.println(seqNum+":"+msg);
+    String seq = MakeConstantDigits(UDPclient.seqNumber);
+    String len = MakeConstantDigits(msg.length());
+    if ((seq != null) && (seq.length() == 6) && (len != null) && (len.length() == 6)) {
+      UDPclient.waitingForAckDataBuffer.put(UDPclient.seqNumber,msg);
+      msg = UDPclient.sessionID + "#seq#" + seq + "#len#" + len + "#msg#" + msg;
+
+      msgByteArray = msg.getBytes();
+      datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, hostAddr, UDPclient.portToBeConnected);
+      datagramSocket.send(datagramPacket);
+
+    } else {
+      System.out.println("seq num / length is not in correct format");
     }
   }
 

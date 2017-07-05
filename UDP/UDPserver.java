@@ -10,7 +10,6 @@ import java.util.*;
 public class UDPserver {
   private static int port;
   private static int bufferSize;
-//  private static ArrayList<Integer> sessions;
   private static Map<Integer,String> seqNumbers;
   private static int activeSession;
   private long time;
@@ -22,7 +21,7 @@ public class UDPserver {
   }
 
   public static void main(String[] args) throws Exception{
-    UDPserver server = new UDPserver(7777,65507);
+    UDPserver server = new UDPserver(7777,100);
     server.up();
   }
 
@@ -32,17 +31,13 @@ public class UDPserver {
       socket = new DatagramSocket(port);
       //buffer to receive incoming data
       byte[] incomingBuffer = new byte[bufferSize];
-       DatagramPacket incomingPacket = new DatagramPacket(incomingBuffer,incomingBuffer.length);
+      DatagramPacket incomingPacket = new DatagramPacket(incomingBuffer,incomingBuffer.length);
 
-    // buffer without specifying size
-//      List<Byte> incomingBuffer = new ArrayList<Byte>();
-//      DatagramPacket incomingPacket = new DatagramPacket(ArrayUtils.toPrimitive(incomingBuffer.toArray(new Byte[incomingBuffer.size()])), incomingBuffer.size());
-      //2. Wait for an incoming data
       System.out.println("UDP.Server is Up");
       //communication loop
       while(true) {
         try {
-          socket.setSoTimeout(5000);
+//          socket.setSoTimeout(5000);
 
           socket.receive(incomingPacket);
 
@@ -52,38 +47,47 @@ public class UDPserver {
 //        byte[] data = incomingPacket.getData();
           String msg = new String(incomingPacket.getData(), incomingPacket.getOffset(), incomingPacket.getLength());
           System.out.println("received-->" + msg);
+          System.out.println(msg.length());
+
+          byte[] reply = "Received".getBytes();
+          InetAddress outgoingAddress = incomingPacket.getAddress();
+          int outgoingPort = incomingPacket.getPort();
+          DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, outgoingAddress, outgoingPort);
+          socket.send(outgoingDatagram);
+
+
 //        System.out.println("Session ID = "+Integer.parseInt(msg.substring(0,6)));
-          if (activeSession != Integer.parseInt(msg.substring(0, 6))) {
-            activeSession = Integer.parseInt(msg.substring(0, 6));
-            seqNumbers = new HashMap<Integer, String>();
-          }
-          int seqNum = Integer.parseInt(msg.substring(11, 17));
-          int msgLen = Integer.parseInt(msg.substring(22, 28));
-          int originalLength = 33 + msgLen;
-//        System.out.println("original msg length = "+originalLength);
-          if (originalLength == msg.length()) {
-            String data = msg.substring(33, (33 + msgLen));
-            seqNumbers.put(seqNum, data);
-            System.out.println(data);
-            System.gc();
-
-//        msg = "Received : " + msg;
-            byte[] reply = ("ACK" + msg.substring(11, 17)).getBytes();
-            InetAddress outgoingAddress = incomingPacket.getAddress();
-            int outgoingPort = incomingPacket.getPort();
-
-            DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, outgoingAddress, outgoingPort);
-            socket.send(outgoingDatagram);
-          } else {
-            byte[] reply = ("NAK" + msg.substring(11, 17)).getBytes();
-            InetAddress outgoingAddress = incomingPacket.getAddress();
-            int outgoingPort = incomingPacket.getPort();
-
-            DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, outgoingAddress, outgoingPort);
-            socket.send(outgoingDatagram);
-
-          }
-
+//          if (activeSession != Integer.parseInt(msg.substring(0, 6))) {
+//            activeSession = Integer.parseInt(msg.substring(0, 6));
+//            seqNumbers = new HashMap<Integer, String>();
+//          }
+//          int seqNum = Integer.parseInt(msg.substring(11, 17));
+//          int msgLen = Integer.parseInt(msg.substring(22, 28));
+//          int originalLength = 33 + msgLen;
+////        System.out.println("original msg length = "+originalLength);
+//          if (originalLength == msg.length()) {
+//            String data = msg.substring(33, (33 + msgLen));
+//            seqNumbers.put(seqNum, data);
+//            System.out.println(data);
+//            System.gc();
+//
+////        msg = "Received : " + msg;
+//            byte[] reply = ("ACK" + msg.substring(11, 17)).getBytes();
+//            InetAddress outgoingAddress = incomingPacket.getAddress();
+//            int outgoingPort = incomingPacket.getPort();
+//
+//            DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, outgoingAddress, outgoingPort);
+//            socket.send(outgoingDatagram);
+//          } else {
+//            byte[] reply = ("NAK" + msg.substring(11, 17)).getBytes();
+//            InetAddress outgoingAddress = incomingPacket.getAddress();
+//            int outgoingPort = incomingPacket.getPort();
+//
+//            DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, outgoingAddress, outgoingPort);
+//            socket.send(outgoingDatagram);
+//
+//          }
+//
         } catch (SocketTimeoutException ex) {
           byte[] reply = "Timeout".getBytes();
           InetAddress outgoingAddress = incomingPacket.getAddress();

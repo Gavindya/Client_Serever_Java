@@ -8,6 +8,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by AdminPC on 6/27/2017.
@@ -16,7 +18,7 @@ public class UDPclient {
   public static int portToBeConnected;
   private static int bufferSize;
   private static DatagramSocket datagramSocket;
-
+  public static Map<Integer,String> waitingForAckDataBuffer;
   public static int seqNumber;
   public static int sessionID;
   public static ArrayList<Integer> ackNumbers;
@@ -24,6 +26,7 @@ public class UDPclient {
   private ClientSend write;
 
   UDPclient(int _port,int _bufferSize){
+    waitingForAckDataBuffer = new HashMap<Integer, String>();
     portToBeConnected = _port;
     bufferSize = _bufferSize;
     seqNumber =1;

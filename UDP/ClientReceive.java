@@ -26,11 +26,17 @@ public class ClientReceive extends Thread {
 
         if (s.substring(0, 3).equals("ACK")) {
 //            sendNext = true;
+          UDPclient.waitingForAckDataBuffer.remove(UDPclient.seqNumber);
           UDPclient.seqNumber++;
           System.out.println(s.substring(3, s.length()));
           UDPclient.ackNumbers.add(Integer.parseInt(s.substring(3, replyDatagram.getLength())));
           System.out.println("server GOT seq# " + Integer.parseInt(s.substring(3, replyDatagram.getLength())));
-        } else {
+        } else if(s.substring(0, 3).equals("NAK")) {
+          int seqNotReceived =Integer.parseInt(s.substring(3,s.length()));
+          ClientSend.SendData(seqNotReceived,UDPclient.waitingForAckDataBuffer.get(seqNotReceived));
+        }
+        else{
+
           System.out.println("server MISSED seq# " + s);
 //            sendNext = false;
         }
