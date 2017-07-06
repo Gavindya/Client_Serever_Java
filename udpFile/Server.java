@@ -9,12 +9,12 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class Server {
 
-  public InetAddress server_address;
   public int port;
-  private int windowSize;
+  private static int windowSize;
   private int mss;
   private int timestamp;
-  private ConcurrentMap<Integer,String> pendingClients;
+  private static ConcurrentMap<Integer,String> pendingClients; //saving initial seq num given by server and syn from client
+  private static ConcurrentMap<Integer,ServerNewClient> connectedClients;
 
   Server(int _portNum, int _winSize, int _mss, int _timeStamp){
     port= _portNum;
@@ -22,6 +22,7 @@ public class Server {
     windowSize=_winSize;
     timestamp=_timeStamp;
     pendingClients = new ConcurrentHashMap<Integer, String>();
+    connectedClients=new ConcurrentHashMap<Integer, ServerNewClient>();
   }
 
   public void serverUp(){
@@ -29,8 +30,14 @@ public class Server {
     serverReceive.start();
   }
 
-  public void setPendingClients(int server_sequenceNumber,String syn){
+  public static void setPendingClients(int server_sequenceNumber,String syn){
     pendingClients.put(server_sequenceNumber,syn);
+  }
+  public ConcurrentMap<Integer, String> getPendingClients(){
+    return pendingClients;
+  }
+  public static int getServer_windowSize(){
+    return windowSize;
   }
   public void setServer_windowSize(int window_size){
     windowSize=window_size;
@@ -49,6 +56,12 @@ public class Server {
   }
   public int getTimestamp(){
     return timestamp;
+  }
+  public static void setConnectedClients(int seqNum, ServerNewClient client){
+    connectedClients.put(seqNum,client);
+  }
+  public ConcurrentMap<Integer,ServerNewClient> getConnectedClients(){
+    return connectedClients;
   }
 }
 

@@ -8,19 +8,19 @@ import java.net.InetAddress;
  * Created by AdminPC on 7/5/2017.
  */
 public class ClientSend extends Thread {
-  private Client client;
+//  private Client client;
   private DatagramSocket datagramSocket;
   private DatagramPacket datagramPacket;
 
-  ClientSend(Client _client,DatagramSocket dsocket) {
-    client = _client;
+  ClientSend(DatagramSocket dsocket) {
+//    client = _client;
     datagramSocket = dsocket;
   }
 
   public void sendSYN(InetAddress serverAddr, int portNum) {
     try {
       int sequenceNumber = (int) (Math.random() * 1000000);
-      client.setSequenceNumber(sequenceNumber);
+      Client.setSequenceNumber(sequenceNumber);
       String syn = createMsgSYN(sequenceNumber);
       byte[] msgByteArray = syn.getBytes();
       datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, serverAddr, portNum);
@@ -40,21 +40,40 @@ public class ClientSend extends Thread {
       datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, serverAddr, portNum);
       datagramSocket.send(datagramPacket);
     }catch (Exception ex){
-    System.out.println(ex.getMessage());
+      System.out.println(ex.getMessage());
+    }
   }
 
+  public void sendData(char[] cbuf,int seq,int ack,int window){
+    try{
+      System.out.println(cbuf);
+      String data = createDataMsg(cbuf,seq,ack,window);
+      byte[] msgByteArray = data.getBytes();
+      datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().getServer_address(), Client.getServer().getServer_port());
+      datagramSocket.send(datagramPacket);
+    }catch (Exception ex){
+      System.out.println(ex.getMessage());
+    }
   }
-
+  private String createDataMsg(char[] cbuf,int seq, int ack, int window) {
+    return (MakeConstantDigits(cbuf.length) +
+      MakeConstantDigits(Client.getSequenceNumber()) +
+      MakeConstantDigits(Client.getServer().getServer_sequenceNumber()) +
+      "0000" +
+      MakeConstantDigits(Client.getWindowSize()) +
+      MakeConstantDigits(0) +
+      MakeConstantDigits(0) +
+      MakeConstantDigits(0)+cbuf);
+  }
   private String createMsgSYN(int seqNum) {
     return (MakeConstantDigits(0) +
           MakeConstantDigits(seqNum) +
           MakeConstantDigits(0) +
           "1000" +
-          MakeConstantDigits(client.getWindowSize()) +
-          MakeConstantDigits(client.getMss()) +
-          MakeConstantDigits(client.getWindowSize()) +
-          MakeConstantDigits(client.getTimestamp()));
-
+          MakeConstantDigits(Client.getWindowSize()) +
+          MakeConstantDigits(Client.getMss()) +
+          MakeConstantDigits(Client.getWindowSize()) +
+          MakeConstantDigits(Client.getTimestamp()));
   }
   private String createMsgACK(int seq,int ack,int window) {
     return (MakeConstantDigits(0) +
@@ -65,7 +84,6 @@ public class ClientSend extends Thread {
       MakeConstantDigits(0) +
       MakeConstantDigits(0) +
       MakeConstantDigits(0));
-
   }
 
   private static String MakeConstantDigits(int num) {

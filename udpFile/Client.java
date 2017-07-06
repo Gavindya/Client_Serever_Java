@@ -1,63 +1,60 @@
 package udpFile;
 
 import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Created by AdminPC on 7/5/2017.
  */
 public class Client {
-  public int server_windowSize;
-  public int server_mss;
-  public int server_timestamp;
-  public int server_sequenceNumber;
-  public InetAddress server_address;
-  public int server_port;
-  private int windowSize;
-  private int mss;
-  private int timestamp;
-  private int seqNumber;
 
+  private static int windowSize;
+  private static int mss;
+  private static int timestamp;
+  private static int seqNumber;
+  private static ClientNewServer server;
+  private static byte[] incomingBuffer;
+//  private Queue<String> buffer;
 
   Client(int _mss, int _timestamp,int _window, int _server_port, InetAddress _server_address){
     mss=_mss;
     timestamp=_timestamp;
     windowSize=_window;
-    server_port = _server_port;
-    server_address = _server_address;
+    incomingBuffer = new byte[windowSize];
+//    buffer = new LinkedList<String>();
+    server = new ClientNewServer(_server_port,_server_address);
   }
 
   public void makeConnection(){
-    ClientMakeConnection connection = new ClientMakeConnection(this);
+    ClientMakeConnection connection = new ClientMakeConnection(this,server);
     connection.connect();
   }
-  public void setServer_sequenceNumber(int seqNum){
-    server_sequenceNumber=seqNum;
-  }
-  public void setServer_windowSize(int windowSize){
-    server_windowSize=windowSize;
-  }
-  public void setServer_mss(int mss){
-    server_mss=mss;
-  }
-  public void setServer_timestamp(int timestamp){
-    server_timestamp=timestamp;
-  }
-  public void setSequenceNumber(int sequenceNumber){
+  public static void setSequenceNumber(int sequenceNumber){
     seqNumber=sequenceNumber;
   }
-  public int getSequenceNumber(){
+  public static int getSequenceNumber(){
     return seqNumber;
   }
-
-  public int getWindowSize(){
+  public static int getWindowSize(){
     return windowSize;
   }
-  public int getMss(){
+  public static int getMss(){
     return mss;
   }
-  public int getTimestamp(){
+  public static int getTimestamp(){
     return timestamp;
   }
-
-
+  public static ClientNewServer getServer(){
+    return server;
+  }
+  public static byte[] getIncomingBuffer(){
+    return incomingBuffer;
+  }
+//  public void addToBuffer(String message){
+//    buffer.add(message);
+//  }
+//  public Queue<String> getBuffer(){
+//    return buffer;
+//  }
 }
