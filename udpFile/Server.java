@@ -13,6 +13,7 @@ public class Server {
   private static int windowSize;
   private int mss;
   private int timestamp;
+  private int waitingTime;
   private static ConcurrentMap<Integer,String> pendingClients; //saving initial seq num given by server and syn from client
   private static ConcurrentMap<Integer,ServerNewClient> connectedClients;
 

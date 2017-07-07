@@ -32,4 +32,7 @@ public class ServerNewClient extends Thread{
     System.out.println("client started");
 
   }
+  public String getMessage(){
+    return null;
+  }
 }

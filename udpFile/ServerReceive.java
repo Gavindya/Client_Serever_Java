@@ -35,31 +35,53 @@ public class ServerReceive extends Thread{
           System.out.println(msg.length());
 
           if(msg.substring(18,19).equals("1")&&msg.substring(19,20).equals("1")){
+            System.out.println("----------------------------");
+            System.out.println("client seq "+msg.substring(6,12));
+            System.out.println("server seq"+msg.substring(12,18));
             System.out.println("syn ack");
           }else if(msg.substring(18,19).equals("1")){
+            System.out.println("----------------------------");
+            System.out.println("client seq "+msg.substring(6,12));
+            System.out.println("server seq"+msg.substring(12,18));
             System.out.println("syn ");
             ServerSend serverSend = new ServerSend(server,socket);
             serverSend.sendSYN_ACK(incomingPacket.getAddress(),incomingPacket.getPort(),msg);
           }
           else if(msg.substring(19,20).equals("1")){
+            System.out.println("----------------------------");
+            System.out.println("client seq "+msg.substring(6,12));
+            System.out.println("server seq"+msg.substring(12,18));
             System.out.println("ack ");
             ServerAccept serverAccept = new ServerAccept(server);
             boolean accepted =  serverAccept.AcceptClient(msg);
-            if(accepted){
-              ServerSend serverSend = new ServerSend(server,socket);
-              serverSend.sendACK(incomingPacket.getAddress(),incomingPacket.getPort(),msg);
+            System.out.println( " client accepted ? "+accepted);
+//            if(accepted){
+//              ServerSend serverSend = new ServerSend(server,socket);
+//              serverSend.sendACK(incomingPacket.getAddress(),incomingPacket.getPort(),msg);
 
-            }
+//            }
           }
           else if(msg.substring(19,20).equals("1") && msg.substring(20,21).equals("1")){
+            System.out.println("----------------------------");
+            System.out.println("client seq "+msg.substring(6,12));
+            System.out.println("server seq"+msg.substring(12,18));
             System.out.println("ack fin ");
           }
           else if(msg.substring(20,21).equals("1")){
+            System.out.println("----------------------------");
+            System.out.println("client seq "+msg.substring(6,12));
+            System.out.println("server seq"+msg.substring(12,18));
             System.out.println("fin ");
           }
           else if(msg.substring(21,22).equals("1")){
+            System.out.println("----------------------------");
+            System.out.println("client seq "+msg.substring(6,12));
+            System.out.println("server seq"+msg.substring(12,18));
             System.out.println("reset ");
           }else{
+            System.out.println("----------------------------");
+            System.out.println("client seq "+msg.substring(6,12));
+            System.out.println("server seq"+msg.substring(12,18));
 
 //            for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
 //            {

@@ -5,7 +5,7 @@ package udpFile;
  */
 public class RunServer {
   public static void main(String[] args) {
-    Server server = new Server(7777,65000,5,4500);
+    Server server = new Server(7777,65000,100,5000);
     server.serverUp();
   }
 }

@@ -5,15 +5,16 @@ import java.net.InetAddress;
 /**
  * Created by AdminPC on 7/6/2017.
  */
-public class ClientNewServer {
+public class ClientServerConfiguration {
   public int server_windowSize;
   public int server_mss;
   public int server_timestamp;
   public int server_sequenceNumber;
   public InetAddress server_address;
   public int server_port;
+  public long keepAliveTime=4000;
 
-  ClientNewServer(int _server_port, InetAddress _server_address){
+  ClientServerConfiguration(int _server_port, InetAddress _server_address){
     server_port = _server_port;
     server_address = _server_address;
   }
@@ -36,5 +37,8 @@ public class ClientNewServer {
   public int getServer_port(){return server_port;}
   public InetAddress getServer_address(){
     return server_address;
+  }
+  public long getKeepAliveTime(){
+    return keepAliveTime;
   }
 }

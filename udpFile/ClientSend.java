@@ -17,17 +17,21 @@ public class ClientSend extends Thread {
     datagramSocket = dsocket;
   }
 
-  public void sendSYN(InetAddress serverAddr, int portNum) {
-    try {
+  public void sendSYN(InetAddress serverAddr, int portNum) throws Exception{
+//    try {
+      System.out.println("sending SYN");
       int sequenceNumber = (int) (Math.random() * 1000000);
       Client.setSequenceNumber(sequenceNumber);
       String syn = createMsgSYN(sequenceNumber);
+      System.out.println("syn"+syn);
       byte[] msgByteArray = syn.getBytes();
       datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, serverAddr, portNum);
+//      Client.setSentTime(System.currentTimeMillis());
+//      Client.addOutgoingBuffer(msgByteArray);
       datagramSocket.send(datagramPacket);
-    }catch (Exception ex){
-      System.out.println(ex.getMessage());
-    }
+//    }catch (Exception ex){
+//      System.out.println(ex.getMessage());
+//    }
 
   }
 
@@ -46,16 +50,19 @@ public class ClientSend extends Thread {
 
   public void sendData(char[] cbuf,int seq,int ack,int window){
     try{
-      System.out.println(cbuf);
-      String data = createDataMsg(cbuf,seq,ack,window);
+//      String data = createDataMsg(cbuf,seq,ack,window);
+      String data = createDataMsg(cbuf);
       byte[] msgByteArray = data.getBytes();
+      Client.addOutgoingBuffer(msgByteArray); //add to buffer
       datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().getServer_address(), Client.getServer().getServer_port());
       datagramSocket.send(datagramPacket);
     }catch (Exception ex){
       System.out.println(ex.getMessage());
     }
   }
-  private String createDataMsg(char[] cbuf,int seq, int ack, int window) {
+  private String createDataMsg(char[] cbuf) {
+//    private String createDataMsg(char[] cbuf,int seq, int ack, int window) {
+      String text = String.valueOf(cbuf);
     return (MakeConstantDigits(cbuf.length) +
       MakeConstantDigits(Client.getSequenceNumber()) +
       MakeConstantDigits(Client.getServer().getServer_sequenceNumber()) +
@@ -63,7 +70,7 @@ public class ClientSend extends Thread {
       MakeConstantDigits(Client.getWindowSize()) +
       MakeConstantDigits(0) +
       MakeConstantDigits(0) +
-      MakeConstantDigits(0)+cbuf);
+      MakeConstantDigits(0)+text);
   }
   private String createMsgSYN(int seqNum) {
     return (MakeConstantDigits(0) +
@@ -86,6 +93,17 @@ public class ClientSend extends Thread {
       MakeConstantDigits(0));
   }
 
+  public void resend(byte[] msg){
+    try{
+
+      System.out.println("resending"+new String(msg));
+//      Client.setSentTime(System.currentTimeMillis());
+      datagramPacket = new DatagramPacket(msg, msg.length, Client.getServer().getServer_address(), Client.getServer().getServer_port());
+      datagramSocket.send(datagramPacket);
+    }catch (Exception ex){
+      System.out.println(ex.getMessage());
+    }
+  }
   private static String MakeConstantDigits(int num) {
     String str = Integer.toString(num);
 

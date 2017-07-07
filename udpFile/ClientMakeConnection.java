@@ -12,9 +12,9 @@ public class ClientMakeConnection {
   private DatagramSocket datagramSocket;
   private InetAddress hostAddress;
   private Client client;
-  private ClientNewServer server;
+  private ClientServerConfiguration server;
 
-  ClientMakeConnection(Client _client, ClientNewServer _server){
+  ClientMakeConnection(Client _client, ClientServerConfiguration _server){
     client = _client;
     server = _server;
     serverPort = server.server_port;
@@ -25,11 +25,12 @@ public class ClientMakeConnection {
     try {
       datagramSocket = new DatagramSocket();
       udpFile.ClientSend clientSend = new udpFile.ClientSend(datagramSocket);
-      ClientReceive clientReceive = new ClientReceive(client,server,datagramSocket);
+      ClientReceive clientReceive = new ClientReceive(server,datagramSocket);
 
+      clientReceive.start();
       clientSend.sendSYN(hostAddress,serverPort);
 //      clientSend.sendACK(InetAddress.getLocalHost(),7777,987456,663258,client.getWindowSize());
-      clientReceive.start();
+
 
     }
     catch(Exception e){
