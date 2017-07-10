@@ -39,6 +39,7 @@ public class ClientSendProcessedData extends Thread {
                     resendCounter=0;
                 }
                 System.out.println("IS WINDOW EMPTY??? :"+isEmpty);
+              System.out.println("Num of elements in window ="+numOfElementsInWindow);
                 if(numOfElementsInWindow<Client.window.length){
                     System.out.println("BUFFER SIZE :- " + Client.getBuffer().length);
                     System.out.println("INDEX :- " + index);
@@ -53,19 +54,33 @@ public class ClientSendProcessedData extends Thread {
                                 if(isEmpty){
                                     System.out.println("Since window is empty : adding to widow's "+i+"th location");
                                     Client.window[i] = str;
+                                    Client.setBuffer(null,(index + i));
+                                    Client.setSequenceNumber(Client.getSequenceNumber() + 1);
+                                    Client.getServer().setServer_sequenceNumber(Client.getServer().getServer_sequenceNumber() + 1);
+                                    numOfElementsInWindow++;
                                 }else if((numOfElementsInWindow+i)<Client.window.length){
                                     System.out.println("Since window is NOT empty : adding to widow's "+numOfElementsInWindow+"th location");
-                                    Client.window[numOfElementsInWindow+i] = str;
+//                                    Client.window[numOfElementsInWindow+i] = str;
+                                    int indexEmpty = numOfElementsInWindow;
+                                    for(int y=0;y<Client.window.length;y++){
+                                      if(Client.window[y]==null){
+                                        indexEmpty=y;
+                                        System.out.println("Empty location-------"+y);
+                                        break;
+                                      }
+                                    }
+                                    Client.window[indexEmpty]=str;
+                                    Client.setBuffer(null,(index + i));
+                                    Client.setSequenceNumber(Client.getSequenceNumber() + 1);
+                                    Client.getServer().setServer_sequenceNumber(Client.getServer().getServer_sequenceNumber() + 1);
+                                    numOfElementsInWindow++;
                                 }
                                 else if((numOfElementsInWindow+i)==Client.window.length){
                                     System.out.println("window is FUL");
-                                    index=index+i;
+//                                    index=index+i;
                                     System.out.println("INDEX = "+index+" :: NUM_OF_ELEMENTS="+numOfElementsInWindow+" ::");
                                     break;
                                 }
-                                Client.setBuffer(null,(index + i));
-                                Client.setSequenceNumber(Client.getSequenceNumber() + 1);
-                                Client.getServer().setServer_sequenceNumber(Client.getServer().getServer_sequenceNumber() + 1);
                             }else if((index+i)==Client.getBufferSize()){
                                 index=0;
                                 break;

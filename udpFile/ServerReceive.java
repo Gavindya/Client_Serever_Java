@@ -14,6 +14,9 @@ public class ServerReceive extends Thread{
 
   private Server server;
   ServerSend serverSend;
+  ServerProcessIncomingMessage processIncomingMessage;
+
+//  ServerSendKeepAlive keepAlive ;
 
   ServerReceive(Server _server){
     server=_server;
@@ -25,10 +28,13 @@ public class ServerReceive extends Thread{
     try {
       DatagramSocket socket = new DatagramSocket(server.port);
       serverSend = new ServerSend(server,socket);
+//      keepAlive = new ServerSendKeepAlive(server,socket);
+//      keepAlive.start();
+
       byte[] incomingBuffer = new byte[server.getWindowSize()];
       DatagramPacket incomingPacket = new DatagramPacket(incomingBuffer, incomingBuffer.length);
       System.out.println("UDP.Server is Up");
-      ServerProcessIncomingMessage processIncomingMessage = new ServerProcessIncomingMessage(server,socket,incomingPacket);
+
 
       while (true) {
         try {
@@ -37,8 +43,11 @@ public class ServerReceive extends Thread{
           socket.receive(incomingPacket);
           String msg = new String(incomingPacket.getData(), incomingPacket.getOffset(), incomingPacket.getLength());
           System.out.println("received-->" + msg);
+          processIncomingMessage=  new ServerProcessIncomingMessage(server,socket,incomingPacket,msg);
           System.out.println(msg.length());
-          processIncomingMessage.processMsg(msg);
+          processIncomingMessage.start();
+          processIncomingMessage.join();
+//          Thread.sleep(500);
 
         } catch (Exception ex) {
           System.out.println(ex.getMessage());

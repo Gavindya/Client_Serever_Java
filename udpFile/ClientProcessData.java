@@ -15,8 +15,8 @@ public class ClientProcessData extends Thread {
     BufferedReader BR;
     boolean isEmpty = false;
 
-    ClientProcessData() throws Exception{
-        filepath = "src/test.txt";
+    ClientProcessData(String _filepath) throws Exception{
+        filepath = _filepath;
         offset = 0;
         BR = new BufferedReader(new FileReader(filepath));
     }

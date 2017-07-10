@@ -1,6 +1,10 @@
 package udpFile;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -14,27 +18,34 @@ public class Server {
   private int mss;
   private int timestamp;
   private int waitingTime;
-  private static ConcurrentMap<Integer,String> pendingClients; //saving initial seq num given by server and syn from client
+  private int keepAliveInterval;
+  private static ConcurrentMap<String,Map<Integer,String>> pendingClients; //saving initial seq num given by server and syn from client
   private static ConcurrentMap<Integer,ServerNewClient> connectedClients;
 
-  Server(int _portNum, int _winSize, int _mss, int _timeStamp){
+  Server(int _portNum, int _winSize, int _mss, int _timeStamp,int _keepAliveInterval){
     port= _portNum;
     mss=_mss;
     windowSize=_winSize;
     timestamp=_timeStamp;
-    pendingClients = new ConcurrentHashMap<>();
-    connectedClients=new ConcurrentHashMap<>();
+    pendingClients = new ConcurrentHashMap<String, Map<Integer,String>>();
+    connectedClients=new ConcurrentHashMap<Integer, ServerNewClient>();
+    keepAliveInterval=_keepAliveInterval;
   }
 
   public void serverUp(){
     ServerReceive serverReceive = new ServerReceive(this);
     serverReceive.start();
+
   }
 
-  public static void setPendingClients(int server_sequenceNumber,String syn){
-    pendingClients.put(server_sequenceNumber,syn);
+  public int getKeepAliveInterval(){return keepAliveInterval;}
+
+  public static void setPendingClients(int server_sequenceNumber, String syn, String session){
+    Map<Integer,String> clientDetails  = new HashMap<Integer, String>();
+    clientDetails.put(server_sequenceNumber,syn);
+    pendingClients.put(session,clientDetails);
   }
-  public ConcurrentMap<Integer, String> getPendingClients(){
+  public ConcurrentMap<String, Map<Integer,String>> getPendingClients(){
     return pendingClients;
   }
   public static int getServer_windowSize(){

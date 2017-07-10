@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by AdminPC on 7/5/2017.
@@ -21,6 +22,7 @@ public class Client {
   private static byte[] outgoingBuffer;
   public static String[] window;
   private static char[][] buffer;
+  private static String sessionID;
 //  public static Map<Integer,byte[]> buffer; //seqNum n bytes
 //  private static long sentTime;
 //  private Queue<String> buffer;
@@ -39,6 +41,12 @@ public class Client {
     window = new String[numOfElementInWindow];
 
 
+  }
+  public static void setSessionID(String session){
+    sessionID = session;
+  }
+  public static String getSessionID(){
+    return sessionID;
   }
   public static void setBuffer(char[] data,int index){
     buffer[index]= data;

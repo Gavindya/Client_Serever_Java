@@ -14,7 +14,7 @@ public class ClientReceive extends Thread {
   private ClientServerConfiguration server;
   ClientSendFile sendFile;
   ClientSend clientSend;
-  ClientSendKeepAlive keepAlive;
+//  ClientSendKeepAlive keepAlive;
   int resendCount =0;//resend calc
   int clientWaitingTime; //maximum waiting time of client
   int maxResendTimes; //number of times to b resend
@@ -25,7 +25,7 @@ public class ClientReceive extends Thread {
     server = _server;
     clientSend = new udpFile.ClientSend(datagramSocket);
     clientWaitingTime =Client.getWaitingTime();
-    keepAlive=new ClientSendKeepAlive(datagramSocket);
+//    keepAlive=new ClientSendKeepAlive(datagramSocket);
   }
 
   public void run() {
@@ -71,6 +71,7 @@ public class ClientReceive extends Thread {
             server.setServer_windowSize(Integer.parseInt(msg.substring(22,28)));
 //            Client.setWindow(server.getServer_windowSize());
             Client.setSequenceNumber(Integer.parseInt(msg.substring(12,18)));
+            Client.setSessionID(msg.substring(46,msg.length()));
 
             Client.getServer().isAlive= true;
 
@@ -85,9 +86,11 @@ public class ClientReceive extends Thread {
             Client.setSequenceNumber(Client.getSequenceNumber()+1);
             //once syn-ack received, start sending keepalive
             //but if server does not respond after sometime, stop sending keepalive
-            keepAlive.start();
+
             sendProcessedData= new ClientSendProcessedData(datagramSocket);
             sendProcessedData.start();
+//            sendProcessedData.join();
+//            keepAlive.start();
 //            sendFile = new ClientSendFile(datagramSocket);
 //            sendFile.send();
 //            sendFile.send(client.getSequenceNumber(),server.server_sequenceNumber,client.getWindowSize());
@@ -102,6 +105,10 @@ public class ClientReceive extends Thread {
           System.out.println("server seq "+msg.substring(6,12));
           System.out.println("client seq"+msg.substring(12,18));
           System.out.println("syn ");
+        }
+        else if(msg.substring(18,22).equals("0000")&&msg.substring(12,18).equals("000000")){
+          System.out.println("keep alive received from server");
+
         }
         else if(msg.substring(19,20).equals("1")){
           System.out.println("----------------------------");

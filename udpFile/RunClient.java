@@ -11,7 +11,7 @@ public class RunClient {
     Client client = new Client(2048,1000,65400,9999, InetAddress.getLocalHost(),25000,15,2);
     client.makeConnection();
 //    client.setServer();
-    ClientProcessData clientProcessData = new ClientProcessData();
+    ClientProcessData clientProcessData = new ClientProcessData("src/test3.txt");
     clientProcessData.start();
 
   }

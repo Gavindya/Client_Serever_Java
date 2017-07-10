@@ -7,21 +7,24 @@ import java.util.Map;
 /**
  * Created by Gavindya Jayawardena on 7/9/2017.
  */
-public class ServerProcessIncomingMessage {
+public class ServerProcessIncomingMessage extends Thread {
     private Server server;
     ServerSend serverSend;
     DatagramSocket socket;
     DatagramPacket incomingPacket;
-    ServerReceivedData receivedData;
+     String msg;
 
-    ServerProcessIncomingMessage(Server _server,DatagramSocket _socket,DatagramPacket _incomingPacket){
+
+    ServerProcessIncomingMessage(Server _server,DatagramSocket _socket,DatagramPacket _incomingPacket, String _msg){
         server=_server;
         socket= _socket;
         incomingPacket = _incomingPacket;
-        receivedData = new ServerReceivedData();
+        msg=_msg;
 
     }
-    public void processMsg(String msg) throws Exception{
+    public void run(){
+      try{
+
         if(msg.substring(18,19).equals("1")&&msg.substring(19,20).equals("1")){
             System.out.println("----------------------------");
             System.out.println("client seq "+msg.substring(6,12));
@@ -32,7 +35,7 @@ public class ServerProcessIncomingMessage {
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
             System.out.println("syn ");
-            ServerSend serverSend = new ServerSend(server,socket);
+          serverSend = new ServerSend(server,socket);
             serverSend.sendSYN_ACK(incomingPacket.getAddress(),incomingPacket.getPort(),msg);
         }
         else if(msg.substring(19,20).equals("1")){
@@ -41,7 +44,7 @@ public class ServerProcessIncomingMessage {
             System.out.println("server seq"+msg.substring(12,18));
             System.out.println("ack ");
             ServerAccept serverAccept = new ServerAccept(server);
-            boolean accepted =  serverAccept.AcceptClient(msg);
+            boolean accepted =  serverAccept.AcceptClient(msg,incomingPacket);
             System.out.println( " client accepted ? "+accepted);
             for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
             {
@@ -84,41 +87,65 @@ public class ServerProcessIncomingMessage {
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
 
-//            for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
-//            {
-//              int key = entry.getKey();
-//              int value = entry.getValue().client_seqNumber;
-//              System.out.println("seq num :"+key+" : client seq num = "+value);
-//            }
-
             int serverSeq = Integer.parseInt(msg.substring(12,18));
-            System.out.println("DATA MSG SERVER SEQ + "+serverSeq );
+//            System.out.println("DATA MSG SERVER SEQ + "+serverSeq );
             int clientSeq = Integer.parseInt(msg.substring(6,12));
-            System.out.println("DATA MSG CLIENT SEQ + "+clientSeq );
+            String session = msg.substring(msg.length()-36,msg.length());
+//            System.out.println("DATA MSG CLIENT SEQ + "+clientSeq );
 
             byte[] bytes = msg.substring(46,msg.length()).getBytes();
+//            System.out.println("DATA RECIEVED ="+ msg.substring(46,msg.length()));
+//            System.out.println("DATA RECIEVED LENGTH ="+ msg.substring(46,msg.length()).length());
+//            System.out.println("DATA Supposed to be received ="+ Integer.parseInt(msg.substring(0,6)));
             if(Integer.parseInt(msg.substring(0,6))==bytes.length){
-                System.out.println("DATA IS CORRECT!");
-//                if(server.getConnectedClients().containsKey(serverSeq)){
-//                    System.out.println("sequence number is available");
-                    for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
-                    {
-                        int key = entry.getKey();
-                        System.out.println("KEY-->"+key);
-                        if(key==serverSeq){
-                            ServerNewClient client = entry.getValue();
-                            System.out.println("client seq pre saved = "+client.client_seqNumber);
+                  for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
+                  {
+                      int key = entry.getKey();
+                      System.out.println("KEY-->"+key);
+                      if(key==serverSeq){
+                          ServerNewClient client = entry.getValue();
+                          System.out.println("client seq pre saved = "+client.client_seqNumber);
+                          if(session.equals(client.getSessionID())){
                             if((client.client_seqNumber+1)==clientSeq){
-                                client.client_seqNumber++;
-                                server.getConnectedClients().remove(key);
-                                server.getConnectedClients().put(key+1,client);
-//                                receivedData.getData(msg);
-                                serverSend.sendACK(incomingPacket.getAddress(),incomingPacket.getPort(),msg);
-                                break;
+//                                System.out.println("client seq matched");
+                              serverSend = new ServerSend(server,socket);
+                              serverSend.sendDataACK(incomingPacket.getAddress(),incomingPacket.getPort(),serverSeq,(clientSeq+1));
+//                              ServerReceivedData.getData(serverSeq,msg.substring(46,msg.length()));
+                              client.addData(serverSeq,msg.substring(46,msg.length()));
+                              client.client_seqNumber++;
+//                                client.addToReceivedBuffer(serverSeq,msg.substring(46,msg.length()));
+                              server.getConnectedClients().remove(key);
+                              server.getConnectedClients().put((key+1),client);
+                              break;
                             }
-                        }
-                    }
+                          }
+
+                      }
+                  }
+            }
+            for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
+            {
+              int key = entry.getKey();
+              int value = entry.getValue().client_seqNumber;
+              System.out.println("seq num :"+key+" : client seq num = "+value);
+              if(key==serverSeq){
+                ServerNewClient client = entry.getValue();
+                if(session.equals(client.getSessionID())) {
+                  if ((client.client_seqNumber + 1) == clientSeq) {
+//                  if(Integer.parseInt(msg.substring(0,6))== msg.substring(46,msg.length()).length()){
+                    serverSend = new ServerSend(server, socket);
+                    serverSend.sendDataACK(incomingPacket.getAddress(), incomingPacket.getPort(), serverSeq, (clientSeq + 1));
+//                    ServerReceivedData.getData(serverSeq,msg.substring(46,msg.length()));
+                    client.addData(serverSeq, msg.substring(46, msg.length()));
+                    client.client_seqNumber++;
+//                  client.addToReceivedBuffer(serverSeq,msg.substring(46,msg.length()));
+                    server.getConnectedClients().remove(key);
+                    server.getConnectedClients().put((key + 1), client);
+//                  }
+                  }
                 }
+              }
+            }
 //            }
 //            System.out.println(new String(bytes,"UTF-8"));
 
@@ -151,5 +178,8 @@ public class ServerProcessIncomingMessage {
 
 
         }
+      }catch (Exception ex){
+        ex.printStackTrace();
+      }
     }
 }

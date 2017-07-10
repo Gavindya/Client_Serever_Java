@@ -34,19 +34,20 @@ public class ClientSend extends Thread {
 //    }
 
   }
-
 //  clientSend.sendACK(client.server_address,client.server_port,client.getSequenceNumber()+1,client.server_sequenceNumber+1,client.getWindowSize());
-  public void sendKeepAlive(){
-    try{
-      String keepAlive = createMsgKeepAlive();
-      byte[] msgByteArray = keepAlive.getBytes();
-      datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().server_address, Client.getServer().server_port);
-      datagramSocket.send(datagramPacket);
-      System.out.println("sending KeepAlive time ="+System.currentTimeMillis());
-    }catch(Exception ex){
-      ex.printStackTrace();
-    }
-  }
+
+
+  //  public void sendKeepAlive(){
+//    try{
+//      String keepAlive = createMsgKeepAlive();
+//      byte[] msgByteArray = keepAlive.getBytes();
+//      datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().server_address, Client.getServer().server_port);
+//      datagramSocket.send(datagramPacket);
+//      System.out.println("sending KeepAlive time ="+System.currentTimeMillis());
+//    }catch(Exception ex){
+//      ex.printStackTrace();
+//    }
+//  }
   public void sendACK(InetAddress serverAddr, int portNum,int seq,int ack,int window) {
     try{
 
@@ -77,27 +78,28 @@ public class ClientSend extends Thread {
       System.out.println(ex.getMessage());
     }
   }
-  private String createMsgKeepAlive(){
-    return (MakeConstantDigits(0) +
-            MakeConstantDigits(Client.getSequenceNumber()-2) +
-            MakeConstantDigits(0) +
-            "0000" +
-            MakeConstantDigits(0) +
-            MakeConstantDigits(0) +
-            MakeConstantDigits(0) +
-            MakeConstantDigits(0));
-  }
+//  private String createMsgKeepAlive(){
+//    return (MakeConstantDigits(0) +
+//            MakeConstantDigits(Client.getSequenceNumber()-2) +
+//            MakeConstantDigits(0) +
+//            "0000" +
+//            MakeConstantDigits(0) +
+//            MakeConstantDigits(0) +
+//            MakeConstantDigits(0) +
+//            MakeConstantDigits(0));
+//  }
   private String createDataMsg(char[] cbuf) {
 //    private String createDataMsg(char[] cbuf,int seq, int ack, int window) {
       String text = String.valueOf(cbuf);
-    return (MakeConstantDigits(cbuf.length) +
+      int dataLen =cbuf.length+Client.getSessionID().length();
+      return (MakeConstantDigits(dataLen) +
       MakeConstantDigits(Client.getSequenceNumber()) +
       MakeConstantDigits(Client.getServer().getServer_sequenceNumber()) +
       "0000" +
       MakeConstantDigits(Client.getWindowSize()) +
       MakeConstantDigits(0) +
       MakeConstantDigits(0) +
-      MakeConstantDigits(0)+text);
+      MakeConstantDigits(0)+text+Client.getSessionID());
   }
   private String createMsgSYN(int seqNum) {
     return (MakeConstantDigits(0) +
@@ -117,7 +119,7 @@ public class ClientSend extends Thread {
       MakeConstantDigits(window) +
       MakeConstantDigits(0) +
       MakeConstantDigits(0) +
-      MakeConstantDigits(0));
+      MakeConstantDigits(0)+Client.getSessionID());
   }
 
   public void resend(byte[] msg){
