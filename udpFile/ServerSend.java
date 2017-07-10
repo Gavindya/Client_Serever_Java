@@ -18,6 +18,9 @@ public class ServerSend {
     datagramSocket = _socket;
   }
 
+//  public void sendKeepAlive(InetAddress clientAddr, int clientPort){
+//
+//  }
   public void sendSYN_ACK(InetAddress clientAddr, int clientPort, String synMsg){
     try {
       System.out.println("sending syn ack");
@@ -50,23 +53,9 @@ public class ServerSend {
       int receivedClientSeq = Integer.parseInt(msg.substring(6,12));
       int ack =  receivedClientSeq +1; //excpected client seq = curent client seq+1
       byte[] reply = createMsgACK(serverSeq,ack).getBytes();
+        System.out.println("SENDING ACK-->"+createMsgACK(serverSeq,ack));
       DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, clientAddr, clientPort);
       datagramSocket.send(outgoingDatagram);
-
-      if(server.getConnectedClients().containsKey(serverSeq)){
-        for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
-        {
-          int key = entry.getKey();
-          if(key==serverSeq){
-            ServerNewClient client = entry.getValue();
-            client.client_seqNumber=receivedClientSeq;
-            server.getConnectedClients().remove(key);
-            server.getConnectedClients().put(key+1,client);
-            break;
-          }
-        }
-      }
-
     }catch (Exception ex){
       System.out.println(ex.getMessage());
     }

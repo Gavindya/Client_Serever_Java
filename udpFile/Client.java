@@ -1,6 +1,10 @@
 package udpFile;
 
+import java.lang.reflect.Array;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by AdminPC on 7/5/2017.
@@ -9,30 +13,51 @@ public class Client {
 
   private static int windowSize;
   private static int mss;
-  private static int timestamp;
+  private static int maxWaitingTime;
   private static int seqNumber;
-  private static int waitingTime;
+  private static int keepAliveInterval;
   private static ClientServerConfiguration server;
   private static byte[] incomingBuffer;
   private static byte[] outgoingBuffer;
+  public static String[] window;
+  private static char[][] buffer;
+//  public static Map<Integer,byte[]> buffer; //seqNum n bytes
 //  private static long sentTime;
 //  private Queue<String> buffer;
 
-  Client(int _mss, int _timestamp,int _window, int _server_port, InetAddress _server_address,int _waitingTime){
+  Client(int _mss, int _keepAliveInterval,int _window, int _server_port, InetAddress _server_address,int _waitingTime,int bufferSize,int numOfElementInWindow){
     mss=_mss;
-    timestamp=_timestamp;
-    waitingTime=_waitingTime;
+    maxWaitingTime=_waitingTime;
+    keepAliveInterval=_keepAliveInterval;
     windowSize=_window;
     incomingBuffer = new byte[windowSize];
 //    buffer = new LinkedList<String>();
     server = new ClientServerConfiguration(_server_port,_server_address);
     outgoingBuffer = new byte[windowSize];
+    buffer = new char[bufferSize][];
+//    buffer = new HashMap<>();
+    window = new String[numOfElementInWindow];
 
+
+  }
+  public static void setBuffer(char[] data,int index){
+    buffer[index]= data;
+  }
+  public static char[][] getBuffer(){
+    return buffer;
+  }
+  public static int getBufferSize(){
+    return buffer.length;
   }
   public static int getWaitingTime(){
-    return waitingTime;
+    return maxWaitingTime;
   }
 
+//  public static void setWindow(String element){
+//  }
+//  public static String[] getWindow(){
+//    return window;
+//  }
   public void makeConnection(){
     ClientMakeConnection connection = new ClientMakeConnection(this,server);
     connection.connect();
@@ -44,13 +69,18 @@ public class Client {
     return sentTime;
   }*/
   public static void addOutgoingBuffer(byte[] msg) {
+//    buffer.put(Integer.parseInt(String.valueOf(msg).substring(12,18)),msg);
+    outgoingBuffer=msg;
+  }
+  public static void currentOutgoingMsg(byte[] msg){
     outgoingBuffer=msg;
   }
   public static byte[] getOutgoingBuffer() {
     return outgoingBuffer;
   }
-  public static void clearOutgoingBuffer(){
+  public static void clearOutgoingBuffer(int serverSeqNum){
     outgoingBuffer = new byte[windowSize];
+//    buffer.remove(serverSeqNum);
   }
   public static void setSequenceNumber(int sequenceNumber){
     seqNumber=sequenceNumber;
@@ -64,8 +94,8 @@ public class Client {
   public static int getMss(){
     return mss;
   }
-  public static int getTimestamp(){
-    return timestamp;
+  public static int getKeepAliveTimeInerval(){
+    return keepAliveInterval;
   }
   public static ClientServerConfiguration getServer(){
     return server;
@@ -78,5 +108,13 @@ public class Client {
 //  }
 //  public Queue<String> getBuffer(){
 //    return buffer;
+//  }
+//  public void setServer() throws Exception{
+//    server = new ClientServerConfiguration(9999,InetAddress.getLocalHost());
+//    server.setServer_sequenceNumber(6666);
+//    server.setServer_mss(100);
+//    server.setServer_timestamp(5000);
+//    server.setServer_windowSize(2);
+//
 //  }
 }

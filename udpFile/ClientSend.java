@@ -36,10 +36,22 @@ public class ClientSend extends Thread {
   }
 
 //  clientSend.sendACK(client.server_address,client.server_port,client.getSequenceNumber()+1,client.server_sequenceNumber+1,client.getWindowSize());
+  public void sendKeepAlive(){
+    try{
+      String keepAlive = createMsgKeepAlive();
+      byte[] msgByteArray = keepAlive.getBytes();
+      datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().server_address, Client.getServer().server_port);
+      datagramSocket.send(datagramPacket);
+      System.out.println("sending KeepAlive time ="+System.currentTimeMillis());
+    }catch(Exception ex){
+      ex.printStackTrace();
+    }
+  }
   public void sendACK(InetAddress serverAddr, int portNum,int seq,int ack,int window) {
     try{
 
       String syn = createMsgACK(seq,ack,window);
+        System.out.println("ACK for syn-ack "+syn);
       byte[] msgByteArray = syn.getBytes();
       datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, serverAddr, portNum);
       datagramSocket.send(datagramPacket);
@@ -48,17 +60,32 @@ public class ClientSend extends Thread {
     }
   }
 
-  public void sendData(char[] cbuf,int seq,int ack,int window){
+//  public void sendData(){
+    public void sendData(char[] cbuf){
     try{
 //      String data = createDataMsg(cbuf,seq,ack,window);
-      String data = createDataMsg(cbuf);
-      byte[] msgByteArray = data.getBytes();
-      Client.addOutgoingBuffer(msgByteArray); //add to buffer
-      datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().getServer_address(), Client.getServer().getServer_port());
-      datagramSocket.send(datagramPacket);
+//      for(char[] cbuf : Client.getBuffer()){
+        String data = createDataMsg(cbuf);
+        byte[] msgByteArray = data.getBytes();
+//      Client.addOutgoingBuffer(msgByteArray); //add to outgoing buffer
+        Client.currentOutgoingMsg(msgByteArray); //add to current buffer
+        datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().getServer_address(), Client.getServer().getServer_port());
+        datagramSocket.send(datagramPacket);
+//      }
+
     }catch (Exception ex){
       System.out.println(ex.getMessage());
     }
+  }
+  private String createMsgKeepAlive(){
+    return (MakeConstantDigits(0) +
+            MakeConstantDigits(Client.getSequenceNumber()-2) +
+            MakeConstantDigits(0) +
+            "0000" +
+            MakeConstantDigits(0) +
+            MakeConstantDigits(0) +
+            MakeConstantDigits(0) +
+            MakeConstantDigits(0));
   }
   private String createDataMsg(char[] cbuf) {
 //    private String createDataMsg(char[] cbuf,int seq, int ack, int window) {
@@ -80,7 +107,7 @@ public class ClientSend extends Thread {
           MakeConstantDigits(Client.getWindowSize()) +
           MakeConstantDigits(Client.getMss()) +
           MakeConstantDigits(Client.getWindowSize()) +
-          MakeConstantDigits(Client.getTimestamp()));
+          MakeConstantDigits(Client.getKeepAliveTimeInerval()));
   }
   private String createMsgACK(int seq,int ack,int window) {
     return (MakeConstantDigits(0) +

@@ -30,6 +30,9 @@ public class ServerNewClient extends Thread{
     System.out.println("client seqNum = "+client_seqNumber);
     System.out.println("Server seqNum = "+server_seqNumber);
     System.out.println("client started");
+//    while (true){
+//
+//    }
 
   }
   public String getMessage(){

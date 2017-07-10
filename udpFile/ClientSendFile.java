@@ -2,6 +2,7 @@ package udpFile;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
@@ -23,7 +24,7 @@ public class ClientSendFile {
     clientSend = new ClientSend(datagramSocket);
   }
 
-  public void send( int client_seq, int server_ack, int window) throws Exception {
+  public void send() throws Exception {
 
     BufferedReader BR = new BufferedReader(new FileReader(filepath));
     cbuf = new char[Client.getServer().getServer_mss()];
@@ -32,17 +33,42 @@ public class ClientSendFile {
 //    while (resendCount<5){
     BR.skip(offset);
     BR.read(cbuf, 0, cbuf.length);
-    System.out.println(cbuf);
-
+//    System.out.println(cbuf);
     if(cbuf[0]!=0){
-      clientSend.sendData(cbuf,client_seq,server_ack,window);
+      clientSend.sendData(cbuf);
     }
-//      cbuf = new char[cbuf.length];
-      System.gc();
-//      resendCount++;
+      cbuf = new char[cbuf.length];
+    for(char[] c : Client.getBuffer()){
+      System.out.println("client buffer "+c);
+    }
+    boolean isEmpty =false;
+    for(char[] entry : Client.getBuffer()){
+      if(entry!=null){
+        isEmpty =false;
+        break;
+      }else{
+        isEmpty=true;
+      }
+    }
+    System.out.println("is Empty ? "+isEmpty);
+    if(isEmpty){
+      for (int i=0;i<Client.getBufferSize();i++) {
+        BR.read(cbuf, 0, cbuf.length);
+        Client.setBuffer(cbuf,i);
+        cbuf = new char[cbuf.length];
+      }
+      for(char[] c : Client.getBuffer()){
+        System.out.println("client buffer : "+String.valueOf(c));
+      }
+    }
+    System.gc();
 //    }
   }
   public void setOffset(){
-    offset=offset+Client.getServer().getServer_mss();
+//    offset=offset+Client.getServer().getServer_mss();
+
+    offset=offset+(Client.getBufferSize()*Client.getServer().getServer_mss());
   }
+
+
 }

@@ -7,8 +7,12 @@ import java.net.InetAddress;
  */
 public class RunClient {
   public static void main(String[] args) throws Exception {
-    //Client(int _mss, int _timestamp,int _window, int _server_port, InetAddress _server_address){
-    Client client = new Client(2048,5000,65400,7777, InetAddress.getLocalHost(),25000);
+    //Client(int _mss, int _keepAliveTimeInterval,int _window, int _server_port, InetAddress _server_address,waitingtime){
+    Client client = new Client(2048,1000,65400,9999, InetAddress.getLocalHost(),25000,15,2);
     client.makeConnection();
+//    client.setServer();
+    ClientProcessData clientProcessData = new ClientProcessData();
+    clientProcessData.start();
+
   }
 }

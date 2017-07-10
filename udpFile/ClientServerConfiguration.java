@@ -13,6 +13,7 @@ public class ClientServerConfiguration {
   public InetAddress server_address;
   public int server_port;
   public long keepAliveTime=4000;
+  public boolean isAlive;
 
   ClientServerConfiguration(int _server_port, InetAddress _server_address){
     server_port = _server_port;
@@ -21,6 +22,7 @@ public class ClientServerConfiguration {
   public void setServer_sequenceNumber(int seqNum){
     server_sequenceNumber=seqNum;
   }
+
   public void setServer_windowSize(int windowSize){
     server_windowSize=windowSize;
   }

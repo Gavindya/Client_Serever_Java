@@ -22,8 +22,8 @@ public class Server {
     mss=_mss;
     windowSize=_winSize;
     timestamp=_timeStamp;
-    pendingClients = new ConcurrentHashMap<Integer, String>();
-    connectedClients=new ConcurrentHashMap<Integer, ServerNewClient>();
+    pendingClients = new ConcurrentHashMap<>();
+    connectedClients=new ConcurrentHashMap<>();
   }
 
   public void serverUp(){
