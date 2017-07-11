@@ -28,8 +28,12 @@ public class ServerReceivedData {
   public void getData(Integer serverSeq,String data) throws Exception{
     received.put(serverSeq,data);
     if(received.size()>5){
+//      int min = Integer.MAX_VALUE;
 
       for(Map.Entry<Integer,String> entry : received.entrySet()){
+//        if(entry.getKey()<min){
+//          min = entry.getKey();
+//        }
         System.out.println("Received buffer -->"+entry.getKey()+":"+entry.getValue());
       }
     }

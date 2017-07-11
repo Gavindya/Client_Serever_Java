@@ -132,7 +132,7 @@ public class ClientSendProcessedData extends Thread {
                 MakeConstantDigits(windowSize) +
                 MakeConstantDigits(0) +
                 MakeConstantDigits(0) +
-                MakeConstantDigits(0)+text);
+                MakeConstantDigits(0)+text+Client.getSessionID());
     }
     private static String MakeConstantDigits(int num) {
         String str = Integer.toString(num);

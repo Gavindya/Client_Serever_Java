@@ -88,15 +88,9 @@ public class ServerProcessIncomingMessage extends Thread {
             System.out.println("server seq"+msg.substring(12,18));
 
             int serverSeq = Integer.parseInt(msg.substring(12,18));
-//            System.out.println("DATA MSG SERVER SEQ + "+serverSeq );
             int clientSeq = Integer.parseInt(msg.substring(6,12));
             String session = msg.substring(msg.length()-36,msg.length());
-//            System.out.println("DATA MSG CLIENT SEQ + "+clientSeq );
-
-            byte[] bytes = msg.substring(46,msg.length()).getBytes();
-//            System.out.println("DATA RECIEVED ="+ msg.substring(46,msg.length()));
-//            System.out.println("DATA RECIEVED LENGTH ="+ msg.substring(46,msg.length()).length());
-//            System.out.println("DATA Supposed to be received ="+ Integer.parseInt(msg.substring(0,6)));
+            byte[] bytes = msg.substring(46,(msg.length()-36)).getBytes();
             if(Integer.parseInt(msg.substring(0,6))==bytes.length){
                   for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
                   {
@@ -111,7 +105,7 @@ public class ServerProcessIncomingMessage extends Thread {
                               serverSend = new ServerSend(server,socket);
                               serverSend.sendDataACK(incomingPacket.getAddress(),incomingPacket.getPort(),serverSeq,(clientSeq+1));
 //                              ServerReceivedData.getData(serverSeq,msg.substring(46,msg.length()));
-                              client.addData(serverSeq,msg.substring(46,msg.length()));
+                              client.addData(serverSeq,msg.substring(46,(msg.length()-36)));
                               client.client_seqNumber++;
 //                                client.addToReceivedBuffer(serverSeq,msg.substring(46,msg.length()));
                               server.getConnectedClients().remove(key);
@@ -136,8 +130,8 @@ public class ServerProcessIncomingMessage extends Thread {
                     serverSend = new ServerSend(server, socket);
                     serverSend.sendDataACK(incomingPacket.getAddress(), incomingPacket.getPort(), serverSeq, (clientSeq + 1));
 //                    ServerReceivedData.getData(serverSeq,msg.substring(46,msg.length()));
-                    client.addData(serverSeq, msg.substring(46, msg.length()));
-                    client.client_seqNumber++;
+                      client.addData(serverSeq,msg.substring(46,(msg.length()-36)));
+                      client.client_seqNumber++;
 //                  client.addToReceivedBuffer(serverSeq,msg.substring(46,msg.length()));
                     server.getConnectedClients().remove(key);
                     server.getConnectedClients().put((key + 1), client);

@@ -60,8 +60,6 @@ public class ClientSend extends Thread {
       System.out.println(ex.getMessage());
     }
   }
-
-//  public void sendData(){
     public void sendData(char[] cbuf){
     try{
 //      String data = createDataMsg(cbuf,seq,ack,window);
@@ -78,16 +76,26 @@ public class ClientSend extends Thread {
       System.out.println(ex.getMessage());
     }
   }
-//  private String createMsgKeepAlive(){
-//    return (MakeConstantDigits(0) +
-//            MakeConstantDigits(Client.getSequenceNumber()-2) +
-//            MakeConstantDigits(0) +
-//            "0000" +
-//            MakeConstantDigits(0) +
-//            MakeConstantDigits(0) +
-//            MakeConstantDigits(0) +
-//            MakeConstantDigits(0));
-//  }
+    public void sendKeepAlive(){
+        try{
+            String data = createMsgKeepAlive();
+            byte[] msgByteArray = data.getBytes();
+            datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().getServer_address(), Client.getServer().getServer_port());
+            datagramSocket.send(datagramPacket);
+        }catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+  private String createMsgKeepAlive(){
+    return (MakeConstantDigits(0) +
+            MakeConstantDigits(Client.getSequenceNumber()-2) +
+            MakeConstantDigits(0) +
+            "0000" +
+            MakeConstantDigits(0) +
+            MakeConstantDigits(0) +
+            MakeConstantDigits(0) +
+            MakeConstantDigits(0) );
+  }
   private String createDataMsg(char[] cbuf) {
 //    private String createDataMsg(char[] cbuf,int seq, int ack, int window) {
       String text = String.valueOf(cbuf);
