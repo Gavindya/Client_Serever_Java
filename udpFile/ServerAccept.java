@@ -22,7 +22,7 @@ public class ServerAccept {
 
     InetAddress incomingAddress = incomingPacket.getAddress();
     //check received ack has session id given by server
-    String session = clientMsg.substring((clientMsg.length()-36),clientMsg.length());
+    String session = clientMsg.substring((clientMsg.length()-20),clientMsg.length());
 
     if(pendingClients.containsKey(session)){
       int serverSeq = Integer.parseInt(clientMsg.substring(12,18));

@@ -29,7 +29,7 @@ public class ClientMakeConnection {
 
       clientReceive.start();
       clientSend.sendSYN(hostAddress,serverPort);
-//      clientSend.sendACK(InetAddress.getLocalHost(),7777,987456,663258,client.getWindowSize());
+//      clientSend.sendACK(InetAddress.getLocalHost(),7777,987456,663258,client.getServer_windowSize());
 
 
     }

@@ -24,11 +24,17 @@ public class ClientProcessData extends Thread {
     public void run(){
         try{
 //            cbuf = new char[Client.getServer().getServer_mss()];
-            cbuf = new char[50];
-            while (true) {
+
+          //define the data size to be sent to mss of server - (session key size)
+          //          System.out.println("Server MSS = "+Client.getServer().getServer_mss());
+          //          cbuf = new char[Client.getServer().getServer_mss()-20];
+
+          while (true) {
                 Thread.sleep(5000);
                 if(Client.getServer().isAlive){
-                    BR.skip(offset);
+                  System.out.println("Server MSS = "+Client.getServer().getServer_mss());
+                  cbuf = new char[Client.getServer().getServer_mss()-20];
+//                    BR.skip(offset);
                     for (char[] entry : Client.getBuffer()) {
                         if (entry != null) {
                             isEmpty = false;
@@ -42,17 +48,29 @@ public class ClientProcessData extends Thread {
                     if (isEmpty) {
 //                    setOffset();
                         for (int i = 0; i < Client.getBufferSize(); i++) {
-                            BR.read(cbuf, 0, cbuf.length);
-                            Client.setBuffer(cbuf, i);
-                            cbuf = new char[cbuf.length];
+                            if(BR.read(cbuf, 0, cbuf.length)!=-1){
+                              Client.setBuffer(cbuf, i);
+                              cbuf = new char[cbuf.length];
+                              Client.noData=false;
+                            }else {
+                              Client.noData=true;
+                              break;
+                            }
                         }
                         for (char[] c : Client.getBuffer()) {
+                          if(c!=null){
                             System.out.println("client buffer : " + String.valueOf(c));
+                          }else{
+                            System.out.println("client buffer : " + c);
+                          }
+
                         }
                     }
                     System.gc();
                 }else{
-                    break;
+                    Client.noData=true;
+                    return;
+//                    break;
                 }
             }
         }catch (Exception ex){

@@ -1,12 +1,7 @@
 package udpFile;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by AdminPC on 7/5/2017.
@@ -22,6 +17,7 @@ public class ServerNewClient extends Thread{
   private ServerReceivedData receivedData;
   private InetAddress address;
   private String sessionID;
+  ReceivedStream receivedStream ;
 
   ServerNewClient(int server_seqNum, String clientSYN, int clientSeq, String filePath, InetAddress clientAddress,String _sessionID) throws Exception{
     address = clientAddress;
@@ -34,6 +30,7 @@ public class ServerNewClient extends Thread{
     sessionID = _sessionID;
     receivedData = new ServerReceivedData(filePath);
     Server.setConnectedClients(server_seqNum,this);
+    receivedStream= new ReceivedStream();
 
   }
 
@@ -43,25 +40,36 @@ public class ServerNewClient extends Thread{
   public InetAddress getAddress(){
     return address;
   }
-  public void addData(int seqNum, String data) throws Exception{
-    receivedData.getData(seqNum,data);
+  public boolean addData(int seqNum, String data) throws Exception{
+    return receivedData.getData(seqNum, data);
+  }
+  public ServerReceivedData getReceivedData(){
+    return receivedData;
   }
 
+  public StringBuilder getMessageBuilt(){
+    return receivedStream.getReceived();
+  }
   public void run(){
     try{
-      System.out.println("client window = "+client_windowSize);
-      System.out.println("client mss = "+client_mss);
-      System.out.println("client time = "+client_timestamp);
-      System.out.println("client seqNum = "+client_seqNumber);
-      System.out.println("Server seqNum = "+server_seqNumber);
+//      System.out.println("client window = "+client_windowSize);
+//      System.out.println("client mss = "+client_mss);
+//      System.out.println("client time = "+client_timestamp);
+//      System.out.println("client seqNum = "+client_seqNumber);
+//      System.out.println("Server seqNum = "+server_seqNumber);
       System.out.println("client started");
+      while (true){
+        //even if receiving window is not full, after 5 seconds, clear the window
+        if(receivedData.receivedDataMap.size() == Server.getReceivingWindowSize() || ((System.currentTimeMillis()-receivedData.getDataLastReceivedTime())>5000)){
+//      if(receivedData.received.size() == Server.getReceivingWindowSize() || ((System.currentTimeMillis()-receivedData.getDataLastReceivedTime())>client_timestamp)){
 
+          receivedStream.setReceived(receivedData.receivedDataMap);
+          receivedData.receivedDataMap=new ConcurrentHashMap<Integer, String>();
+        }
+      }
     }catch (Exception ex){
       ex.printStackTrace();
     }
-  }
-  public String getMessage(){
-    return null;
   }
 
 }

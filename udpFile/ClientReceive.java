@@ -93,11 +93,12 @@ public class ClientReceive extends Thread {
 //            keepAlive.start();
 //            sendFile = new ClientSendFile(datagramSocket);
 //            sendFile.send();
-//            sendFile.send(client.getSequenceNumber(),server.server_sequenceNumber,client.getWindowSize());
+//            sendFile.send(client.getSequenceNumber(),server.server_sequenceNumber,client.getServer_windowSize());
 //            Client.setSequenceNumber(Client.getSequenceNumber()+1);
-          }else{
-            clientSend.resend(Client.getOutgoingBuffer());
           }
+//          else{
+//            clientSend.resend(Client.getOutgoingBuffer());
+//          }
 
 
         }else if(msg.substring(18,19).equals("1")){
@@ -110,25 +111,35 @@ public class ClientReceive extends Thread {
           System.out.println("keep alive received from server");
 
         }
+        else if(msg.substring(19,20).equals("1") && msg.substring(20,21).equals("1")){
+          System.out.println("ack fin ");
+          String session =msg.substring(msg.length()-20,msg.length());
+          if(session.equals(Client.getSessionID())){
+            Client.getServer().isAlive=false;
+          }
+        }
         else if(msg.substring(19,20).equals("1")){
           System.out.println("----------------------------");
           System.out.println("server seq "+msg.substring(6,12));
           System.out.println("client seq"+msg.substring(12,18));
           System.out.println("ack ");
 
-          int receivedServerSeq = Integer.parseInt(msg.substring(6,12));
+          if(msg.substring(msg.length()-20,msg.length()).equals(Client.getSessionID())){
+            int receivedServerSeq = Integer.parseInt(msg.substring(6,12));
 
-          for(int i =0;i<Client.window.length;i++){
-            if(Client.window[i]!=null ){
-              if(Integer.parseInt(Client.window[i].substring(12,18))==receivedServerSeq){
-                Client.window[i]=null;
+            for(int i =0;i<Client.window.length;i++){
+              if(Client.window[i]!=null ){
+                if(Integer.parseInt(Client.window[i].substring(12,18))==receivedServerSeq){
+                  Client.window[i]=null;
+                }
               }
             }
+            System.out.println("AFTER RECEIVING ACK CLIENT WINDO ENTRIES---:===");
+            for(String str : Client.window){
+              System.out.println(str);
+            }
           }
-          System.out.println("AFTER RECEIVING ACK CLIENT WINDO ENTRIES---:===");
-          for(String str : Client.window){
-            System.out.println(str);
-          }
+
 //          if(server.server_sequenceNumber==Integer.parseInt(msg.substring(6,12))){
 //
 //            Client.clearOutgoingBuffer(server.server_sequenceNumber);//clear buffer
@@ -145,9 +156,6 @@ public class ClientReceive extends Thread {
 //          }
 
         }
-        else if(msg.substring(19,20).equals("1") && msg.substring(20,21).equals("1")){
-          System.out.println("ack fin ");
-        }
         else if(msg.substring(20,21).equals("1")){
           System.out.println("fin ");
         }
@@ -156,7 +164,8 @@ public class ClientReceive extends Thread {
         }
 
      }catch (Exception e) {
-        e.printStackTrace();
+//        e.printStackTrace();
+        System.out.println(e.getMessage());
 //        if(Client.getOutgoingBuffer()!=null){
 //          if(resendCount < maxResendTimes) {
 //            clientSend.resend(Client.getOutgoingBuffer());
@@ -169,7 +178,8 @@ public class ClientReceive extends Thread {
       }
     }
     } catch (SocketException e) {
-      e.printStackTrace();
+//      e.printStackTrace();
+      System.out.println(e.getMessage());
 
     }
   }

@@ -1,10 +1,7 @@
 package udpFile;
 
-import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -17,12 +14,12 @@ public class Server {
   private static int windowSize;
   private int mss;
   private int timestamp;
-  private int waitingTime;
   private int keepAliveInterval;
   private static ConcurrentMap<String,Map<Integer,String>> pendingClients; //saving initial seq num given by server and syn from client
   private static ConcurrentMap<Integer,ServerNewClient> connectedClients;
+  private static int receivingWindowSize;
 
-  Server(int _portNum, int _winSize, int _mss, int _timeStamp,int _keepAliveInterval){
+  Server(int _portNum, int _winSize, int _mss, int _timeStamp,int _keepAliveInterval,int _receivingWindowSize){
     port= _portNum;
     mss=_mss;
     windowSize=_winSize;
@@ -30,6 +27,7 @@ public class Server {
     pendingClients = new ConcurrentHashMap<String, Map<Integer,String>>();
     connectedClients=new ConcurrentHashMap<Integer, ServerNewClient>();
     keepAliveInterval=_keepAliveInterval;
+    receivingWindowSize=_receivingWindowSize;
   }
 
   public void serverUp(){
@@ -44,6 +42,9 @@ public class Server {
     Map<Integer,String> clientDetails  = new HashMap<Integer, String>();
     clientDetails.put(server_sequenceNumber,syn);
     pendingClients.put(session,clientDetails);
+  }
+  public static int getReceivingWindowSize(){
+    return receivingWindowSize;
   }
   public ConcurrentMap<String, Map<Integer,String>> getPendingClients(){
     return pendingClients;
@@ -60,9 +61,6 @@ public class Server {
   public void setServer_timestamp(int _timestamp){
     timestamp=_timestamp;
   }
-  public int getWindowSize(){
-    return windowSize;
-  }
   public int getMss(){
     return mss;
   }
@@ -74,6 +72,12 @@ public class Server {
   }
   public ConcurrentMap<Integer,ServerNewClient> getConnectedClients(){
     return connectedClients;
+  }
+
+  public StringBuilder getReceivedData(int key){
+    ServerNewClient client = connectedClients.get(key);
+    return client.getMessageBuilt();
+
   }
 }
 

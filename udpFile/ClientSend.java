@@ -34,7 +34,7 @@ public class ClientSend extends Thread {
 //    }
 
   }
-//  clientSend.sendACK(client.server_address,client.server_port,client.getSequenceNumber()+1,client.server_sequenceNumber+1,client.getWindowSize());
+//  clientSend.sendACK(client.server_address,client.server_port,client.getSequenceNumber()+1,client.server_sequenceNumber+1,client.getServer_windowSize());
 
 
   //  public void sendKeepAlive(){

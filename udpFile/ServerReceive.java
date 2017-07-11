@@ -2,10 +2,6 @@ package udpFile;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by AdminPC on 7/5/2017.
@@ -31,7 +27,7 @@ public class ServerReceive extends Thread{
 //      keepAlive = new ServerSendKeepAlive(server,socket);
 //      keepAlive.start();
 
-      byte[] incomingBuffer = new byte[server.getWindowSize()];
+      byte[] incomingBuffer = new byte[server.getServer_windowSize()];
       DatagramPacket incomingPacket = new DatagramPacket(incomingBuffer, incomingBuffer.length);
       System.out.println("UDP.Server is Up");
 

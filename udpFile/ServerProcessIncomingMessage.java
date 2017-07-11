@@ -64,12 +64,26 @@ public class ServerProcessIncomingMessage extends Thread {
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
             System.out.println("ack fin ");
+
         }
         else if(msg.substring(20,21).equals("1")){
             System.out.println("----------------------------");
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
             System.out.println("fin ");
+            String session = msg.substring(msg.length()-20,msg.length());
+            int serverSeq = Integer.parseInt(msg.substring(12,18));
+            int clientSeq = Integer.parseInt(msg.substring(6,12));
+            for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet()) {
+              ServerNewClient tempClient = entry.getValue();
+//              int currentKey = entry.getKey();
+              if(tempClient.getSessionID().equals(session)){
+                serverSend = new ServerSend(server,socket);
+                serverSend.sendFINack(incomingPacket.getAddress(),incomingPacket.getPort(),serverSeq,(clientSeq+1),tempClient.getSessionID());
+//                server.getConnectedClients().remove(currentKey);
+                break;
+              }
+            }
         }
         else if(msg.substring(21,22).equals("1")){
             System.out.println("----------------------------");
@@ -89,9 +103,9 @@ public class ServerProcessIncomingMessage extends Thread {
 
             int serverSeq = Integer.parseInt(msg.substring(12,18));
             int clientSeq = Integer.parseInt(msg.substring(6,12));
-            String session = msg.substring(msg.length()-36,msg.length());
-            byte[] bytes = msg.substring(46,(msg.length()-36)).getBytes();
-            if(Integer.parseInt(msg.substring(0,6))==bytes.length){
+            String session = msg.substring(msg.length()-20,msg.length());
+            byte[] bytes = msg.substring(46,(msg.length()-20)).getBytes();
+            if(Integer.parseInt(msg.substring(0,6))==(bytes.length+session.length())){
                   for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
                   {
                       int key = entry.getKey();
@@ -103,17 +117,19 @@ public class ServerProcessIncomingMessage extends Thread {
                             if((client.client_seqNumber+1)==clientSeq){
 //                                System.out.println("client seq matched");
                               serverSend = new ServerSend(server,socket);
-                              serverSend.sendDataACK(incomingPacket.getAddress(),incomingPacket.getPort(),serverSeq,(clientSeq+1));
+                              System.out.println("PROCESS server seq : "+serverSeq+" client seq = "+clientSeq+" IN METH 1");
 //                              ServerReceivedData.getData(serverSeq,msg.substring(46,msg.length()));
-                              client.addData(serverSeq,msg.substring(46,(msg.length()-36)));
-                              client.client_seqNumber++;
+                              if(client.addData(serverSeq,msg.substring(46,(msg.length()-20)))){
+                                serverSend.sendDataACK(incomingPacket.getAddress(),incomingPacket.getPort(),serverSeq,(clientSeq+1),client.getSessionID());
+                                client.client_seqNumber++;
 //                                client.addToReceivedBuffer(serverSeq,msg.substring(46,msg.length()));
-                              server.getConnectedClients().remove(key);
-                              server.getConnectedClients().put((key+1),client);
-                              break;
+                                server.getConnectedClients().remove(key);
+                                server.getConnectedClients().put((key+1),client);
+                                break;
+                              }
+
                             }
                           }
-
                       }
                   }
             }
@@ -126,16 +142,19 @@ public class ServerProcessIncomingMessage extends Thread {
                 ServerNewClient client = entry.getValue();
                 if(session.equals(client.getSessionID())) {
                   if ((client.client_seqNumber + 1) == clientSeq) {
-//                  if(Integer.parseInt(msg.substring(0,6))== msg.substring(46,msg.length()).length()){
-                    serverSend = new ServerSend(server, socket);
-                    serverSend.sendDataACK(incomingPacket.getAddress(), incomingPacket.getPort(), serverSeq, (clientSeq + 1));
-//                    ServerReceivedData.getData(serverSeq,msg.substring(46,msg.length()));
-                      client.addData(serverSeq,msg.substring(46,(msg.length()-36)));
-                      client.client_seqNumber++;
-//                  client.addToReceivedBuffer(serverSeq,msg.substring(46,msg.length()));
-                    server.getConnectedClients().remove(key);
-                    server.getConnectedClients().put((key + 1), client);
-//                  }
+//                    if(Integer.parseInt(msg.substring(0,6))==(bytes.length+session.length())){
+                      serverSend = new ServerSend(server, socket);
+                      System.out.println("PROCESS servver seq : "+serverSeq+" client seq = "+clientSeq+" IN METH 2");
+
+  //                    ServerReceivedData.getData(serverSeq,msg.substring(46,msg.length()));
+                      if(client.addData(serverSeq,msg.substring(46,(msg.length()-20)))) {
+                        serverSend.sendDataACK(incomingPacket.getAddress(), incomingPacket.getPort(), serverSeq, (clientSeq + 1),client.getSessionID());
+                        client.client_seqNumber++;
+  //                  client.addToReceivedBuffer(serverSeq,msg.substring(46,msg.length()));
+                        server.getConnectedClients().remove(key);
+                        server.getConnectedClients().put((key + 1), client);
+                      }
+//                    }
                   }
                 }
               }

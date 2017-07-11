@@ -3,7 +3,6 @@ package udpFile;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -19,20 +18,48 @@ public class ServerSend {
     datagramSocket = _socket;
   }
 
-//  public void sendKeepAlive(InetAddress clientAddr, int clientPort){
-//
+//  public void closeDatagram(){
+//      datagramSocket.close();
 //  }
+  public void sendFINack(InetAddress clientAddr, int clientPort, int serverSeq, int clientSeq,String sessionID){
+    try {
+      System.out.println("in send fin ack ");
+      byte[] reply = createFINack(serverSeq,clientSeq,sessionID).getBytes();
+      System.out.println("FIN ACK==>"+createFINack(serverSeq,clientSeq,sessionID));
+      DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, clientAddr, clientPort);
+      datagramSocket.send(outgoingDatagram);
+    }catch (Exception ex){
+      System.out.println(ex.getMessage());
+    }
+  }
+  private String createFINack(int serverSeq,int clientSeq,String sessionID){
+    return (MakeConstantDigits(0) +
+      MakeConstantDigits(serverSeq) +
+      MakeConstantDigits(clientSeq) +
+      "0110" +
+      MakeConstantDigits(0) +
+      MakeConstantDigits(0) +
+      MakeConstantDigits(0) +
+      MakeConstantDigits(0)+
+      sessionID);
+  }
   public void sendSYN_ACK(InetAddress clientAddr, int clientPort, String synMsg){
     try {
       System.out.println("sending syn ack");
 //      System.out.println(ackMsg);
       int sequenceNumber = (int) (Math.random() * 1000000);
-      UUID sessionID =UUID.randomUUID();
-      System.out.println(sessionID.toString());
+      long session = UUID.randomUUID().getLeastSignificantBits();
+
+      while (Long.toBinaryString(session).length()!=64){
+        session=UUID.randomUUID().getLeastSignificantBits();
+      }
+      System.out.println(session);
       int ack = Integer.parseInt(synMsg.substring(6,12))+1;
-      Server.setPendingClients(sequenceNumber,synMsg,sessionID.toString());
-      byte[] reply = createMsgSYNACK(sequenceNumber,ack,sessionID).getBytes();
-      System.out.println("Syn ack ="+createMsgSYNACK(sequenceNumber,ack,sessionID));
+      Server.setPendingClients(sequenceNumber,synMsg,String.valueOf(session));
+      String synAck =  createMsgSYNACK(sequenceNumber,ack,session);
+      byte[] reply =synAck.getBytes();
+//      System.out.println(synAck);
+//      System.out.println("Syn ack ="+synAck.substring(synAck.length()-20,synAck.length()));
       DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, clientAddr, clientPort);
       datagramSocket.send(outgoingDatagram);
       System.out.println("datagram sent");
@@ -41,17 +68,17 @@ public class ServerSend {
     }
   }
 
-  private String createMsgSYNACK(int seqNum,int ack,UUID sessionID) {
+  private String createMsgSYNACK(int seqNum,int ack,long sessionID) {
     //syn-ack is sent with sessionID as Data
     return (MakeConstantDigits(0) +
       MakeConstantDigits(seqNum) +
       MakeConstantDigits(ack) +
       "1100" +
-      MakeConstantDigits(server.getWindowSize()) +
+      MakeConstantDigits(server.getServer_windowSize()) +
       MakeConstantDigits(server.getMss()) +
-      MakeConstantDigits(server.getWindowSize()) +
+      MakeConstantDigits(server.getServer_windowSize()) +
       MakeConstantDigits(server.getTimestamp())+
-      (sessionID.toString()));
+      (sessionID));
 
   }
 //  public void sendACK(InetAddress clientAddr, int clientPort, int serverSeq, int clientSeq){
@@ -71,24 +98,24 @@ public class ServerSend {
 //      MakeConstantDigits(serverSeq) +
 //      MakeConstantDigits(clientSeq) +
 //      "0100" +
-//      MakeConstantDigits(server.getWindowSize()) +
+//      MakeConstantDigits(server.getServer_windowSize()) +
 //      MakeConstantDigits(server.getMss()) +
-//      MakeConstantDigits(server.getWindowSize()) +
+//      MakeConstantDigits(server.getServer_windowSize()) +
 //      MakeConstantDigits(server.getTimestamp()));
 //
 //  }
-  public void sendDataACK(InetAddress clientAddr, int clientPort, int serverSeq, int clientSeq){
+  public void sendDataACK(InetAddress clientAddr, int clientPort, int serverSeq, int clientSeq,String sessionID){
     try {
       System.out.println("in send ack method");
-      byte[] reply = createDataACK(serverSeq,clientSeq).getBytes();
-      System.out.println("ACK==>"+createDataACK(serverSeq,clientSeq));
+      byte[] reply = createDataACK(serverSeq,clientSeq,sessionID).getBytes();
+      System.out.println("ACK==>"+createDataACK(serverSeq,clientSeq,sessionID));
       DatagramPacket outgoingDatagram = new DatagramPacket(reply, reply.length, clientAddr, clientPort);
       datagramSocket.send(outgoingDatagram);
     }catch (Exception ex){
       System.out.println(ex.getMessage());
     }
   }
-  private String createDataACK(int serverSeq,int clientSeq) {
+  private String createDataACK(int serverSeq,int clientSeq,String sessionID) {
     return (MakeConstantDigits(0) +
       MakeConstantDigits(serverSeq) +
       MakeConstantDigits(clientSeq) +
@@ -96,7 +123,8 @@ public class ServerSend {
       MakeConstantDigits(0) +
       MakeConstantDigits(0) +
       MakeConstantDigits(0) +
-      MakeConstantDigits(0));
+      MakeConstantDigits(0)+
+      sessionID);
 
   }
   public void sendKeepAlive(int seqNum){

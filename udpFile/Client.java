@@ -23,6 +23,7 @@ public class Client {
   public static String[] window;
   private static char[][] buffer;
   private static String sessionID;
+  public static boolean noData;
 //  public static Map<Integer,byte[]> buffer; //seqNum n bytes
 //  private static long sentTime;
 //  private Queue<String> buffer;
@@ -39,8 +40,7 @@ public class Client {
     buffer = new char[bufferSize][];
 //    buffer = new HashMap<>();
     window = new String[numOfElementInWindow];
-
-
+    noData=false;
   }
   public static void setSessionID(String session){
     sessionID = session;
