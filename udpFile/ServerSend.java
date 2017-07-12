@@ -1,5 +1,6 @@
 package udpFile;
 
+import java.io.DataInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -43,11 +44,11 @@ public class ServerSend {
       MakeConstantDigits(0)+
       sessionID);
   }
-  public void sendSYN_ACK(InetAddress clientAddr, int clientPort, String synMsg){
+  public void sendSYN_ACK(InetAddress clientAddr, int clientPort, String synMsg,int clientSequence,int serverSequence,DataInputStream dataInputStream){
     try {
       System.out.println("sending syn ack");
 //      System.out.println(ackMsg);
-      int sequenceNumber = (int) (Math.random() * 1000000);
+      int sequenceNumber = (int) (Math.random() * 1000);
       long session = UUID.randomUUID().getLeastSignificantBits();
 
       while (Long.toBinaryString(session).length()!=64){

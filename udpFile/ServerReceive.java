@@ -1,5 +1,7 @@
 package udpFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
@@ -31,16 +33,18 @@ public class ServerReceive extends Thread{
       DatagramPacket incomingPacket = new DatagramPacket(incomingBuffer, incomingBuffer.length);
       System.out.println("UDP.Server is Up");
 
-
       while (true) {
         try {
 //          socket.setSoTimeout(5000);
 
           socket.receive(incomingPacket);
+          DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(incomingPacket.getData(), incomingPacket.getOffset(), incomingPacket.getLength()));
+
+          System.out.println(dataInputStream);
+
           String msg = new String(incomingPacket.getData(), incomingPacket.getOffset(), incomingPacket.getLength());
           System.out.println("received-->" + msg);
-          processIncomingMessage=  new ServerProcessIncomingMessage(server,socket,incomingPacket,msg);
-          System.out.println(msg.length());
+          processIncomingMessage=  new ServerProcessIncomingMessage(server,socket,incomingPacket,msg,dataInputStream);
           processIncomingMessage.start();
           processIncomingMessage.join();
 //          Thread.sleep(500);

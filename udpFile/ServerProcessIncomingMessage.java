@@ -1,5 +1,7 @@
 package udpFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.Map;
@@ -12,33 +14,113 @@ public class ServerProcessIncomingMessage extends Thread {
     ServerSend serverSend;
     DatagramSocket socket;
     DatagramPacket incomingPacket;
+  DataInputStream dataInputStream;
      String msg;
 
 
-    ServerProcessIncomingMessage(Server _server,DatagramSocket _socket,DatagramPacket _incomingPacket, String _msg){
+    ServerProcessIncomingMessage(Server _server,DatagramSocket _socket,DatagramPacket _incomingPacket, String _msg,DataInputStream _dataInputStream){
         server=_server;
         socket= _socket;
         incomingPacket = _incomingPacket;
         msg=_msg;
+      dataInputStream=_dataInputStream;
 
     }
+  private String MakeEight(String str) {
+    switch (str.length()) {
+      case 1:
+        return ("0000000" + str);
+      case 2:
+        return ("000000" + str);
+      case 3:
+        return ("00000" + str);
+      case 4:
+        return ("0000" + str);
+      case 5:
+        return ("000" + str);
+      case 6:
+        return ("00" + str);
+      case 7:
+        return ("0" + str);
+      case 8:
+        return (str);
+      default:
+        return (null);
+    }
+  }
+
     public void run(){
       try{
+        StringBuilder str = new StringBuilder();
 
-        if(msg.substring(18,19).equals("1")&&msg.substring(19,20).equals("1")){
+        for(int i=0;i<2;i++){
+          str.append(MakeEight(Integer.toBinaryString(dataInputStream.read())));
+        }
+        int dataLength =Integer.parseInt(str.toString(),2);
+        str=new StringBuilder();
+        for(int i=0;i<4;i++){
+          str.append(MakeEight(Integer.toBinaryString(dataInputStream.read())));
+        }
+        int clientSequence =Integer.parseInt(str.toString(),2);
+        str=new StringBuilder();
+        for(int i=0;i<4;i++){
+          str.append(MakeEight(Integer.toBinaryString(dataInputStream.read())));
+        }
+        int serverSequence =Integer.parseInt(str.toString(),2);
+        str=new StringBuilder();
+        int control = dataInputStream.read();
+        for(int i=0;i<2;i++){
+          str.append(MakeEight(Integer.toBinaryString(dataInputStream.read())));
+        }
+        int window =Integer.parseInt(str.toString(),2);
+        str=new StringBuilder();
+        for(int i=0;i<2;i++){
+          str.append(MakeEight(Integer.toBinaryString(dataInputStream.read())));
+        }
+        int mss =Integer.parseInt(str.toString(),2);
+        str=new StringBuilder();
+        for(int i=0;i<2;i++){
+          str.append(MakeEight(Integer.toBinaryString(dataInputStream.read())));
+        }
+        int timestamp =Integer.parseInt(str.toString(),2);
+        str=new StringBuilder();
+//
+//        StringBuilder xttt = new StringBuilder();
+//        for(int i=0;i<2;i++){
+//          int num = dis.read();
+//          System.out.println(num);
+//          System.out.println("binary-"+MakeEight(Integer.toBinaryString(num)));
+//          xttt.append(MakeEight(Integer.toBinaryString(num)));
+//        }
+//        System.out.println(xttt);
+//        System.out.println(Integer.parseInt(xttt.toString(),2));
+
+//        System.out.println("bytes length===="+b.length);
+//        ByteArrayInputStream bis = new ByteArrayInputStream(b);
+//        DataInputStream dis = new DataInputStream(bis);
+//        dis.skipBytes(4);
+//        StringBuilder x =new StringBuilder();
+//        for(int i=0;i<4;i++){
+//          int num = dis.read();
+//          System.out.println(num);
+//          System.out.println("binary-"+MakeEight(Integer.toBinaryString(num)));
+//          x.append(MakeEight(Integer.toBinaryString(num)));
+//        }
+//        System.out.println(x);
+//        System.out.println("SEQ NUM==="+Integer.parseInt(x.toString(),2));
+
+        if(control==12){
             System.out.println("----------------------------");
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
             System.out.println("syn ack");
-        }else if(msg.substring(18,19).equals("1")){
+        }else if(control==8){
             System.out.println("----------------------------");
-            System.out.println("client seq "+msg.substring(6,12));
-            System.out.println("server seq"+msg.substring(12,18));
             System.out.println("syn ");
-          serverSend = new ServerSend(server,socket);
-            serverSend.sendSYN_ACK(incomingPacket.getAddress(),incomingPacket.getPort(),msg);
+            serverSend = new ServerSend(server,socket);
+            serverSend.sendSYN_ACK(incomingPacket.getAddress(),incomingPacket.getPort(),msg,clientSequence,serverSequence,dataInputStream);
         }
-        else if(msg.substring(19,20).equals("1")){
+        else if(control==4){
             System.out.println("----------------------------");
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
@@ -59,14 +141,14 @@ public class ServerProcessIncomingMessage extends Thread {
 
 //            }
         }
-        else if(msg.substring(19,20).equals("1") && msg.substring(20,21).equals("1")){
+        else if(control==6){
             System.out.println("----------------------------");
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
             System.out.println("ack fin ");
 
         }
-        else if(msg.substring(20,21).equals("1")){
+        else if(control==2){
             System.out.println("----------------------------");
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
@@ -85,17 +167,17 @@ public class ServerProcessIncomingMessage extends Thread {
               }
             }
         }
-        else if(msg.substring(21,22).equals("1")){
+        else if(control==1){
             System.out.println("----------------------------");
             System.out.println("client seq "+msg.substring(6,12));
             System.out.println("server seq"+msg.substring(12,18));
             System.out.println("reset ");
         }
-        else if(msg.substring(18,22).equals("0000")&&msg.substring(12,18).equals("000000")){
-            System.out.println("keep alive received");
-            // serverSend.sendKeepAlive(incomingPacket.getAddress(),incomingPacket.getPort());
-
-        }
+//        else if((control==0)&&msg.substring(12,18).equals("000000")){
+//            System.out.println("keep alive received");
+//            // serverSend.sendKeepAlive(incomingPacket.getAddress(),incomingPacket.getPort());
+//
+//        }
         else{
             System.out.println("---DATA MSG RECEIVED !!!!--------");
             System.out.println("client seq "+msg.substring(6,12));
