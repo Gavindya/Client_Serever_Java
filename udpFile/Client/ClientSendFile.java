@@ -1,10 +1,8 @@
-package udpFile;
+package udpFile.Client;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.lang.reflect.Array;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 
 /**
  * Created by AdminPC on 7/6/2017.

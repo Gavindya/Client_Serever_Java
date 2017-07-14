@@ -1,9 +1,8 @@
-package udpFile;
+package udpFile.Server;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -31,12 +30,17 @@ public class ServerReceivedData {
   public long getDataLastReceivedTime(){
     return dataLastReceived;
   }
-  public boolean getData(Integer serverSeq,String data) throws Exception{
+  public synchronized boolean getData(Integer serverSeq,String data){
+    System.out.println("received data map size = "+receivedDataMap.size()+" : : : Server receiving winow size ==="+Server.getReceivingWindowSize());
     if(receivedDataMap.size()<Server.getReceivingWindowSize()){
-        receivedDataMap.put(serverSeq,data);
+//      System.out.println("INNNN");
+//      System.out.println(serverSeq+":::"+data);
+      receivedDataMap.put(serverSeq,data);
+
         dataLastReceived=System.currentTimeMillis();
+//      System.out.println("received data map size = "+receivedDataMap.size());
         for(Map.Entry<Integer,String> entry : receivedDataMap.entrySet()){
-          System.out.println("Received buffer -->"+entry.getKey()+":"+entry.getValue());
+          System.out.println("RECEIVED BUFFER -->"+entry.getKey()+":"+entry.getValue());
         }
         return true;
     }else{

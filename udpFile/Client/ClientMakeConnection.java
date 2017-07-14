@@ -1,4 +1,4 @@
-package udpFile;
+package udpFile.Client;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -24,7 +24,7 @@ public class ClientMakeConnection {
   public void connect(){
     try {
       datagramSocket = new DatagramSocket();
-      udpFile.ClientSend clientSend = new udpFile.ClientSend(datagramSocket);
+      ClientSend clientSend = new ClientSend(datagramSocket);
       ClientReceive clientReceive = new ClientReceive(server,datagramSocket);
 
       clientReceive.start();

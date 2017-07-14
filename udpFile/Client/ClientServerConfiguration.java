@@ -1,4 +1,4 @@
-package udpFile;
+package udpFile.Client;
 
 import java.net.InetAddress;
 

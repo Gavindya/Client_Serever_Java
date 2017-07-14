@@ -1,5 +1,7 @@
-package udpFile;
+package udpFile.Server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
@@ -8,20 +10,26 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ReceivedStream {
   private StringBuilder message;
-  ReceivedStream(){
-    message=new StringBuilder();
+  private List _listeners = new ArrayList();
+  private Server server;
+
+  ReceivedStream(Server _server){
+    server=_server;
   }
   public StringBuilder getReceived(){
     return message;
   }
-  public void setReceived(Map<Integer,String> dataStream){
+
+  public synchronized void setReceived(Map<Integer,String> dataStream){
     Object[] sequenceNumbers = dataStream.keySet().toArray();
     int[] sortedSeq = insertionSort(sequenceNumbers);
+    message=new StringBuilder();
     for(int i=0;i<sortedSeq.length;i++){
 //      received=received+dataStream.get(sortedSeq[i]);
       System.out.println(sortedSeq[i]+" : "+dataStream.get(sortedSeq[i]));
       message.append(dataStream.get(sortedSeq[i]));
     }
+    _fireClientSentDataEvent(message.toString());
   }
   private int[] insertionSort(Object array[]) {
     int[] seqNum = new int[array.length];
@@ -40,5 +48,9 @@ public class ReceivedStream {
       seqNum[i+1] = key;
     }
     return seqNum;
+  }
+  private synchronized void _fireClientSentDataEvent( String dataStream) {
+    System.out.println("*********Client snt data EVENT FIRED********");
+    server._fireDataReceivedEvent(dataStream);
   }
 }

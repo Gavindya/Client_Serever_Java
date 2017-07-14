@@ -1,4 +1,4 @@
-package udpFile;
+package udpFile.Server;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;

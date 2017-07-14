@@ -1,4 +1,7 @@
-package udpFile;
+package udpFile.Client;
+
+import udpFile.Client.Client;
+import udpFile.Client.ClientProcessData;
 
 import java.net.InetAddress;
 
@@ -17,7 +20,5 @@ public class RunClient {
     if(Client.getServer().isAlive){
       clientProcessData.start();
     }
-
-
   }
 }

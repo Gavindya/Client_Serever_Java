@@ -1,6 +1,4 @@
-package udpFile;
-
-import jdk.nashorn.internal.codegen.ClassEmitter;
+package udpFile.Client;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
