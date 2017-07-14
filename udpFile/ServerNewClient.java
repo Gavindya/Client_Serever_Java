@@ -56,12 +56,12 @@ public class ServerNewClient extends Thread{
 //      System.out.println("client mss = "+client_mss);
 //      System.out.println("client time = "+client_timestamp);
 //      System.out.println("client seqNum = "+client_seqNumber);
-//      System.out.println("Server seqNum = "+server_seqNumber);
+//      System.out.println("ServerModule seqNum = "+server_seqNumber);
       System.out.println("client started");
       while (true){
         //even if receiving window is not full, after 5 seconds, clear the window
         if(receivedData.receivedDataMap.size() == Server.getReceivingWindowSize() || ((System.currentTimeMillis()-receivedData.getDataLastReceivedTime())>5000)){
-//      if(receivedData.received.size() == Server.getReceivingWindowSize() || ((System.currentTimeMillis()-receivedData.getDataLastReceivedTime())>client_timestamp)){
+//      if(receivedData.received.size() == ServerModule.getReceivingWindowSize() || ((System.currentTimeMillis()-receivedData.getDataLastReceivedTime())>client_timestamp)){
 
           receivedStream.setReceived(receivedData.receivedDataMap);
           receivedData.receivedDataMap=new ConcurrentHashMap<Integer, String>();

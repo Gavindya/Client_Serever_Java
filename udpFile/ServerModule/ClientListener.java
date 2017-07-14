@@ -1,4 +1,4 @@
-package udpFile.Server;
+package udpFile.ServerModule;
 
 /**
  * Created by AdminPC on 7/14/2017.

@@ -1,4 +1,4 @@
-package udpFile.Client;
+package udpFile.ClientModule;
 
 /**
  * Created by AdminPC on 7/13/2017.

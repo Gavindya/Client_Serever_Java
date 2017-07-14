@@ -26,7 +26,7 @@ public class Client2 {
   }
 
   public void run() throws Exception{
-    System.out.println("Second TCP.Client");
+    System.out.println("Second TCP.ClientModule");
     Socket socket = new Socket(host,port);
     PrintStream ps = new PrintStream(socket.getOutputStream());
     ps.println("Hello From 2");

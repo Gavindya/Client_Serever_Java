@@ -1,4 +1,4 @@
-package udpFile.Client;
+package udpFile.ClientModule;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
  */
 public class ClientSendFile {
 
-//  private Client client;
+//  private ClientModule client;
   private DatagramSocket datagramSocket;
   String filepath="src/test.txt";
   char[] cbuf;
@@ -63,7 +63,7 @@ public class ClientSendFile {
 //    }
   }
   public void setOffset(){
-//    offset=offset+Client.getServer().getServer_mss();
+//    offset=offset+ClientModule.getServer().getServer_mss();
 
     offset=offset+(Client.getBufferSize()*Client.getServer().getServer_mss());
   }

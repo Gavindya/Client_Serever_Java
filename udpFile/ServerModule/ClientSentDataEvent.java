@@ -1,7 +1,6 @@
-package udpFile.Server;
+package udpFile.ServerModule;
 
 import java.util.EventObject;
-import java.util.Map;
 
 /**
  * Created by AdminPC on 7/14/2017.

@@ -1,4 +1,4 @@
-package udpFile.Client;
+package udpFile.ClientModule;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -21,16 +21,16 @@ public class ClientProcessData extends Thread {
 
     public void run(){
         try{
-//            cbuf = new char[Client.getServer().getServer_mss()];
+//            cbuf = new char[ClientModule.getServer().getServer_mss()];
 
           //define the data size to be sent to mss of server - (session key size)
-          //          System.out.println("Server MSS = "+Client.getServer().getServer_mss());
-          //          cbuf = new char[Client.getServer().getServer_mss()-20];
+          //          System.out.println("ServerModule MSS = "+ClientModule.getServer().getServer_mss());
+          //          cbuf = new char[ClientModule.getServer().getServer_mss()-20];
 
           while (true) {
                 Thread.sleep(5000);
                 if(Client.getServer().isAlive){
-                  System.out.println("Server MSS = "+Client.getServer().getServer_mss());
+                  System.out.println("ServerModule MSS = "+Client.getServer().getServer_mss());
                   cbuf = new char[Client.getServer().getServer_mss()-20];
 //                    BR.skip(offset);
                     for (char[] entry : Client.getBuffer()) {
@@ -61,7 +61,6 @@ public class ClientProcessData extends Thread {
                           }else{
                             System.out.println("client buffer : " + c);
                           }
-
                         }
                     }
                     System.gc();
@@ -79,6 +78,6 @@ public class ClientProcessData extends Thread {
 
     public void setOffset(){
         offset=offset+(Client.getBufferSize()*10);
-//        offset=offset+(Client.getBufferSize()*Client.getServer().getServer_mss());
+//        offset=offset+(ClientModule.getBufferSize()*ClientModule.getServer().getServer_mss());
     }
 }

@@ -1,9 +1,8 @@
-package udpFile.Server;
+package udpFile.ServerModule;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by AdminPC on 7/11/2017.
@@ -50,7 +49,7 @@ public class ReceivedStream {
     return seqNum;
   }
   private synchronized void _fireClientSentDataEvent( String dataStream) {
-    System.out.println("*********Client snt data EVENT FIRED********");
+    System.out.println("*********ClientModule snt data EVENT FIRED********");
     server._fireDataReceivedEvent(dataStream);
   }
 }

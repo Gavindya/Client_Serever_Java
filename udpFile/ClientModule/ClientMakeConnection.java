@@ -1,4 +1,4 @@
-package udpFile.Client;
+package udpFile.ClientModule;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;

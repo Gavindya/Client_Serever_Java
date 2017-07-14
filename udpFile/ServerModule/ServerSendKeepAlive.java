@@ -1,4 +1,4 @@
-package udpFile.Server;
+package udpFile.ServerModule;
 
 import java.net.DatagramSocket;
 import java.util.Map;

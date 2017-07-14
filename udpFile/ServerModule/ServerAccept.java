@@ -1,4 +1,4 @@
-package udpFile.Server;
+package udpFile.ServerModule;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -30,7 +30,7 @@ public class ServerAccept {
         ServerNewClient newClient = new ServerNewClient(serverSequence,clientSeq,clientFile,incomingAddress,
           String.valueOf(sessionID),clientPreSaved.client_windowSize,clientPreSaved.client_mss,
           clientPreSaved.client_timestamp,server);
-//        Server.setConnectedClients(serverSequence,newClient);
+//        ServerModule.setConnectedClients(serverSequence,newClient);
         //non static method
         server.setConnectedClient(serverSequence,newClient);
         newClient.start();

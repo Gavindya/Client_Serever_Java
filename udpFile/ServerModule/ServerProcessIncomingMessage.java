@@ -1,4 +1,4 @@
-package udpFile.Server;
+package udpFile.ServerModule;
 
 import java.io.DataInputStream;
 import java.math.BigInteger;

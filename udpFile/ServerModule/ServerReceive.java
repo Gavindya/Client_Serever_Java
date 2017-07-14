@@ -1,4 +1,4 @@
-package udpFile.Server;
+package udpFile.ServerModule;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -31,7 +31,7 @@ public class ServerReceive extends Thread{
 
       byte[] incomingBuffer = new byte[server.getServer_windowSize()];
       DatagramPacket incomingPacket = new DatagramPacket(incomingBuffer, incomingBuffer.length);
-      System.out.println("UDP.Server is Up");
+      System.out.println("UDP.ServerModule is Up");
 
       while (true) {
         try {

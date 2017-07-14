@@ -1,4 +1,4 @@
-package udpFile.Client;
+package udpFile.ClientModule;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -12,7 +12,7 @@ import java.net.SocketException;
  */
 public class ClientReceive extends Thread {
 
-//  private Client client;
+//  private ClientModule client;
   private DatagramSocket datagramSocket;
   private ClientServerConfiguration server;
   ClientSendFile sendFile;
@@ -111,12 +111,12 @@ public class ClientReceive extends Thread {
           System.out.println("syn ack");
 
           if((Client.getSequenceNumber()+1)==clientSequence){
-//            Client.clearOutgoingBuffer();
+//            ClientModule.clearOutgoingBuffer();
             server.setServer_sequenceNumber(serverSequence+1);
             server.setServer_mss(mss);
             server.setServer_timestamp(timestamp);
             server.setServer_windowSize(window);
-//            Client.setWindow(server.getServer_windowSize());
+//            ClientModule.setWindow(server.getServer_windowSize());
             Client.setSequenceNumber(clientSequence);
             Client.setSessionID(String.valueOf(sessionID));
             Client.getServer().isAlive= true;
@@ -139,10 +139,10 @@ public class ClientReceive extends Thread {
 //            sendFile = new ClientSendFile(datagramSocket);
 //            sendFile.send();
 //            sendFile.send(client.getSequenceNumber(),server.server_sequenceNumber,client.getServer_windowSize());
-//            Client.setSequenceNumber(Client.getSequenceNumber()+1);
+//            ClientModule.setSequenceNumber(ClientModule.getSequenceNumber()+1);
           }
 //          else{
-//            clientSend.resend(Client.getOutgoingBuffer());
+//            clientSend.resend(ClientModule.getOutgoingBuffer());
 //          }
 
 
@@ -187,17 +187,17 @@ public class ClientReceive extends Thread {
 
 //          if(server.server_sequenceNumber==Integer.parseInt(msg.substring(6,12))){
 //
-//            Client.clearOutgoingBuffer(server.server_sequenceNumber);//clear buffer
+//            ClientModule.clearOutgoingBuffer(server.server_sequenceNumber);//clear buffer
 //
 //            sendFile.setOffset();
 //            server.server_sequenceNumber++;
-//            System.out.println("saved client"+Client.getSequenceNumber()+"----- server expected client seq "+msg.substring(12,18));
+//            System.out.println("saved client"+ClientModule.getSequenceNumber()+"----- server expected client seq "+msg.substring(12,18));
 //
 //            sendFile.send();
-////              sendFile.send(Client.getSequenceNumber(),server.server_sequenceNumber,Integer.parseInt(msg.substring(22,28)));//win size at end
+////              sendFile.send(ClientModule.getSequenceNumber(),server.server_sequenceNumber,Integer.parseInt(msg.substring(22,28)));//win size at end
 //
-//            Client.setSequenceNumber(Client.getSequenceNumber()+1);
-//            System.out.println("client seq now="+Client.getSequenceNumber());
+//            ClientModule.setSequenceNumber(ClientModule.getSequenceNumber()+1);
+//            System.out.println("client seq now="+ClientModule.getSequenceNumber());
 //          }
 
         }
@@ -211,12 +211,12 @@ public class ClientReceive extends Thread {
      }catch (Exception e) {
 //        e.printStackTrace();
         System.out.println(e.getMessage());
-//        if(Client.getOutgoingBuffer()!=null){
+//        if(ClientModule.getOutgoingBuffer()!=null){
 //          if(resendCount < maxResendTimes) {
-//            clientSend.resend(Client.getOutgoingBuffer());
+//            clientSend.resend(ClientModule.getOutgoingBuffer());
 //            resendCount++;
 //          }else{
-//            Client.getServer().isAlive= false;
+//            ClientModule.getServer().isAlive= false;
 //            break;
 //          }
 //        }

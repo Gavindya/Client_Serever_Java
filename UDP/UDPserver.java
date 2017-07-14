@@ -33,7 +33,7 @@ public class UDPserver {
       byte[] incomingBuffer = new byte[bufferSize];
       DatagramPacket incomingPacket = new DatagramPacket(incomingBuffer,incomingBuffer.length);
 
-      System.out.println("UDP.Server is Up");
+      System.out.println("UDP.ServerModule is Up");
       //communication loop
       while(true) {
         try {

@@ -1,10 +1,8 @@
-package udpFile.Client;
+package udpFile.ClientModule;
 
-import udpFile.Server.Server;
+import udpFile.ServerModule.Server;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
@@ -33,7 +31,7 @@ public class ClientSendProcessedData extends Thread {
               System.out.println("MAX RESEND COUNT ="+maxResendCount);
               if( !Client.noData){
                 Thread.sleep(500);
-  //                Thread.sleep(Client.getServer().getServer_timestamp());
+  //                Thread.sleep(ClientModule.getServer().getServer_timestamp());
                 numOfElementsInWindow = 0;
                 for (int p = 0; p < Client.window.length; p++) {
                   if (Client.window[p] != null) {
@@ -58,7 +56,7 @@ public class ClientSendProcessedData extends Thread {
                     for (int i = 0; i < Client.window.length; i++) {
                       System.out.println("-------------round " + i + "-------------");
                       if (((index + i) < Client.getBufferSize()) && (Client.getBuffer()[index + i] != null)) {
-  //                                if((numOfElementsInWindow+i)<Client.window.length){
+  //                                if((numOfElementsInWindow+i)<ClientModule.window.length){
   //                                }
                         byte[] str = createDataMsg(Client.getBuffer()[index + i]);
                         System.out.println("message --> " + str);
@@ -71,7 +69,7 @@ public class ClientSendProcessedData extends Thread {
                           numOfElementsInWindow++;
                         } else if ((numOfElementsInWindow + i) < Client.window.length) {
                           System.out.println("Since window is NOT empty : adding to widow's " + numOfElementsInWindow + "th location");
-  //                                    Client.window[numOfElementsInWindow+i] = str;
+  //                                    ClientModule.window[numOfElementsInWindow+i] = str;
                           int indexEmpty = numOfElementsInWindow;
                           for (int y = 0; y < Client.window.length; y++) {
                             if (Client.window[y] == null) {
@@ -97,8 +95,8 @@ public class ClientSendProcessedData extends Thread {
                       }
 
                     }
-  //                        if(Client.getBuffer()[index + Client.window.length]!=null){
-  //                            index = index + Client.window.length;
+  //                        if(ClientModule.getBuffer()[index + ClientModule.window.length]!=null){
+  //                            index = index + ClientModule.window.length;
   //                        }
                     for (int r = 0; r < Client.getBuffer().length; r++) {
                       if (Client.getBuffer()[r] != null) {
@@ -117,7 +115,7 @@ public class ClientSendProcessedData extends Thread {
                     sendOutWindow();
 
                   } else {
-//                    Client.getServer().isAlive = false;
+//                    ClientModule.getServer().isAlive = false;
                   }
                 }
               }else{
@@ -140,19 +138,19 @@ public class ClientSendProcessedData extends Thread {
             windowSize++;
           }
         }
-//        return (MakeConstantDigits(cbuf.length+Client.getSessionID().length()) +
-//                MakeConstantDigits(Client.getSequenceNumber()) +
-//                MakeConstantDigits(Client.getServer().getServer_sequenceNumber()) +
+//        return (MakeConstantDigits(cbuf.length+ClientModule.getSessionID().length()) +
+//                MakeConstantDigits(ClientModule.getSequenceNumber()) +
+//                MakeConstantDigits(ClientModule.getServer().getServer_sequenceNumber()) +
 //                "0000" +
 //                MakeConstantDigits(windowSize) +
 //                MakeConstantDigits(0) +
 //                MakeConstantDigits(0) +
-//                MakeConstantDigits(0)+text+Client.getSessionID());
+//                MakeConstantDigits(0)+text+ClientModule.getSessionID());
 
         ByteArrayOutputStream boas = new ByteArrayOutputStream();
         java.io.DataOutputStream dos = new java.io.DataOutputStream(boas);
 //    //data length 2 bytes
-//        int len = cbuf.length + Client.getSessionID().length();
+//        int len = cbuf.length + ClientModule.getSessionID().length();
         int len = cbuf.length;
         String len1;
         String len2;

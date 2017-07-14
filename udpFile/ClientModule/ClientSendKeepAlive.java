@@ -1,4 +1,4 @@
-package udpFile.Client;
+package udpFile.ClientModule;
 
 import java.net.DatagramSocket;
 
@@ -8,10 +8,10 @@ import java.net.DatagramSocket;
 public class ClientSendKeepAlive extends Thread {
     private long time=0;
     private DatagramSocket datagramSocket;
-    private udpFile.Client.ClientSend clientSend;
+    private udpFile.ClientModule.ClientSend clientSend;
     ClientSendKeepAlive( DatagramSocket _datagramSocket){
         datagramSocket=_datagramSocket;
-        clientSend = new udpFile.Client.ClientSend(datagramSocket);
+        clientSend = new udpFile.ClientModule.ClientSend(datagramSocket);
     }
     public void run(){
         while (Client.getServer().isAlive){

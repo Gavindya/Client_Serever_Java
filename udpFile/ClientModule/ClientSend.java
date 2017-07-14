@@ -1,4 +1,4 @@
-package udpFile.Client;
+package udpFile.ClientModule;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,7 +11,7 @@ import java.net.InetAddress;
  * Created by AdminPC on 7/5/2017.
  */
 public class ClientSend extends Thread {
-//  private Client client;
+//  private ClientModule client;
   private DatagramSocket datagramSocket;
   private DatagramPacket datagramPacket;
 
@@ -102,7 +102,7 @@ public class ClientSend extends Thread {
 //    try{
 //      String keepAlive = createMsgKeepAlive();
 //      byte[] msgByteArray = keepAlive.getBytes();
-//      datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().server_address, Client.getServer().server_port);
+//      datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, ClientModule.getServer().server_address, ClientModule.getServer().server_port);
 //      datagramSocket.send(datagramPacket);
 //      System.out.println("sending KeepAlive time ="+System.currentTimeMillis());
 //    }catch(Exception ex){
@@ -122,10 +122,10 @@ public class ClientSend extends Thread {
     public void sendData(char[] cbuf){
     try{
 //      String data = createDataMsg(cbuf,seq,ack,window);
-//      for(char[] cbuf : Client.getBuffer()){
+//      for(char[] cbuf : ClientModule.getBuffer()){
         String data = createDataMsg(cbuf);
         byte[] msgByteArray = data.getBytes();
-//      Client.addOutgoingBuffer(msgByteArray); //add to outgoing buffer
+//      ClientModule.addOutgoingBuffer(msgByteArray); //add to outgoing buffer
         Client.currentOutgoingMsg(msgByteArray); //add to current buffer
         datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length, Client.getServer().getServer_address(), Client.getServer().getServer_port());
         datagramSocket.send(datagramPacket);
@@ -261,7 +261,7 @@ public class ClientSend extends Thread {
     try{
 
       System.out.println("resending"+new String(msg));
-//      Client.setSentTime(System.currentTimeMillis());
+//      ClientModule.setSentTime(System.currentTimeMillis());
       datagramPacket = new DatagramPacket(msg, msg.length, Client.getServer().getServer_address(), Client.getServer().getServer_port());
       datagramSocket.send(datagramPacket);
     }catch (Exception ex){

@@ -1,4 +1,4 @@
-package udpFile.Server;
+package udpFile.ServerModule;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,7 +31,7 @@ public class ServerReceivedData {
     return dataLastReceived;
   }
   public synchronized boolean getData(Integer serverSeq,String data){
-    System.out.println("received data map size = "+receivedDataMap.size()+" : : : Server receiving winow size ==="+Server.getReceivingWindowSize());
+    System.out.println("received data map size = "+receivedDataMap.size()+" : : : ServerModule receiving winow size ==="+Server.getReceivingWindowSize());
     if(receivedDataMap.size()<Server.getReceivingWindowSize()){
 //      System.out.println("INNNN");
 //      System.out.println(serverSeq+":::"+data);

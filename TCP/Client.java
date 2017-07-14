@@ -24,7 +24,7 @@ public class Client{
 
   public void run(){
     try{
-      System.out.println("First TCP.Client");
+      System.out.println("First TCP.ClientModule");
       Socket socket = new Socket(host,port);
       PrintStream ps = new PrintStream(socket.getOutputStream());
       ps.println("Hello from 1");
