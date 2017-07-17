@@ -6,23 +6,38 @@ import java.net.InetAddress;
  * Created by AdminPC on 7/6/2017.
  */
 public class ClientServerConfiguration {
-  public int server_windowSize;
-  public int server_mss;
-  public int server_timestamp;
-  public int server_sequenceNumber;
-  public InetAddress server_address;
-  public int server_port;
-  public long keepAliveTime=4000;
-  public boolean isAlive;
+  private int server_windowSize;
+  private int server_mss;
+  private int server_timestamp;
+  private int server_sequenceNumber;
+  private InetAddress server_address;
+  private int server_port;
+  private long keepAliveTime=4000;
+  private boolean isAlive;
 
   ClientServerConfiguration(int _server_port, InetAddress _server_address){
     server_port = _server_port;
     server_address = _server_address;
   }
-  public void setServer_sequenceNumber(int seqNum){
+  protected void setServer_sequenceNumber(int seqNum){
     server_sequenceNumber=seqNum;
   }
 
+  protected boolean getIsAlive(){
+    return isAlive;
+  }
+  protected InetAddress getServerAddress(){
+    return server_address;
+  }
+  protected int getServerPort(){
+    return server_port;
+  }
+  protected long getkeepAliveTime(){
+    return keepAliveTime;
+  }
+  protected void setIsAlive(boolean alive){
+    isAlive=alive;
+  }
   public void setServer_windowSize(int windowSize){
     server_windowSize=windowSize;
   }

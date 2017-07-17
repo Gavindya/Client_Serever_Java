@@ -93,11 +93,6 @@ public class ServerProcessIncomingMessage extends Thread {
         if(!str.toString().equals("")){
           sessionID =new BigInteger(str.toString(), 2).longValue();
         }
-//        str=new StringBuilder();
-//        String x = MakeEight(Integer.toBinaryString(dataInputStream.read()));
-//        if(x!=null){
-//          str.append(x);
-//        }
         String dataPortion="";
         try {
           dataPortion = dataInputStream.readUTF();
@@ -105,32 +100,6 @@ public class ServerProcessIncomingMessage extends Thread {
           e.printStackTrace();
         }
         System.out.println("CURRENT DATA==="+dataPortion);
-
-
-//
-//        StringBuilder xttt = new StringBuilder();
-//        for(int i=0;i<2;i++){
-//          int num = dis.read();
-//          System.out.println(num);
-//          System.out.println("binary-"+MakeEight(Integer.toBinaryString(num)));
-//          xttt.append(MakeEight(Integer.toBinaryString(num)));
-//        }
-//        System.out.println(xttt);
-//        System.out.println(Integer.parseInt(xttt.toString(),2));
-
-//        System.out.println("bytes length===="+b.length);
-//        ByteArrayInputStream bis = new ByteArrayInputStream(b);
-//        DataInputStream dis = new DataInputStream(bis);
-//        dis.skipBytes(4);
-//        StringBuilder x =new StringBuilder();
-//        for(int i=0;i<4;i++){
-//          int num = dis.read();
-//          System.out.println(num);
-//          System.out.println("binary-"+MakeEight(Integer.toBinaryString(num)));
-//          x.append(MakeEight(Integer.toBinaryString(num)));
-//        }
-//        System.out.println(x);
-//        System.out.println("SEQ NUM==="+Integer.parseInt(x.toString(),2));
 
         if(control==12){
             System.out.println("syn ack");
@@ -144,12 +113,6 @@ public class ServerProcessIncomingMessage extends Thread {
             ServerAccept serverAccept = new ServerAccept(server);
             boolean accepted =  serverAccept.AcceptClient(incomingPacket,sessionID,serverSequence,clientSequence);
             System.out.println( " client accepted ? "+accepted);
-//            for (Map.Entry<Integer, ServerNewClient> entry : server.getConnectedClients().entrySet())
-//            {
-//                System.out.println("SERVER SEQ = "+entry.getKey());
-//                ServerNewClient client = entry.getValue();
-//                System.out.println("CLIENT SEQ = "+client.client_seqNumber);
-//            }
         }
         else if(control==6){
             System.out.println("ack fin ");

@@ -1,71 +1,78 @@
 package udpFile.ClientModule;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 
-/**
- * Created by Gavindya Jayawardena on 7/9/2017.
- */
 public class ClientProcessData extends Thread {
-    private String filepath;
-    private char[] cbuf;
-    private int offset;
-    BufferedReader BR;
-    boolean isEmpty = false;
 
-    ClientProcessData(String _filepath) throws Exception{
-        filepath = _filepath;
+  private byte[] cbuf;
+  private int offset;
+  private boolean isEmpty = false;
+  private byte[] data;
+  private Client client;
+
+      ClientProcessData(byte[] _data,Client _client) throws Exception{
+        client=_client;
         offset = 0;
-        BR = new BufferedReader(new FileReader(filepath));
+        data=_data;
     }
 
     public void run(){
         try{
-//            cbuf = new char[ClientModule.getServer().getServer_mss()];
-
-          //define the data size to be sent to mss of server - (session key size)
-          //          System.out.println("ServerModule MSS = "+ClientModule.getServer().getServer_mss());
-          //          cbuf = new char[ClientModule.getServer().getServer_mss()-20];
-
           while (true) {
-                Thread.sleep(5000);
-                if(Client.getServer().isAlive){
-                  System.out.println("ServerModule MSS = "+Client.getServer().getServer_mss());
-                  cbuf = new char[Client.getServer().getServer_mss()-20];
-//                    BR.skip(offset);
-                    for (char[] entry : Client.getBuffer()) {
-                        if (entry != null) {
-                            isEmpty = false;
-                            break;
-                        } else {
-                            isEmpty = true;
-                        }
-                    }
-                    System.out.println("is Empty ? " + isEmpty);
-
+                Thread.sleep(3500);
+                if(client.getServer().getIsAlive()){
+                  cbuf = new byte[client.getServer().getServer_mss()-25];
+                   isEmpty=clientBufferEmpty();
                     if (isEmpty) {
-//                    setOffset();
-                        for (int i = 0; i < Client.getBufferSize(); i++) {
-                            if(BR.read(cbuf, 0, cbuf.length)!=-1){
-                              Client.setBuffer(cbuf, i);
-                              cbuf = new char[cbuf.length];
-                              Client.noData=false;
-                            }else {
-                              Client.noData=true;
-                              break;
-                            }
-                        }
-                        for (char[] c : Client.getBuffer()) {
-                          if(c!=null){
-                            System.out.println("client buffer : " + String.valueOf(c));
-                          }else{
-                            System.out.println("client buffer : " + c);
+                      System.out.println("");
+                      if(data==null|| data.length==0){
+                        client.noData=true;
+                        return;
+                      }
+                      else if( data.length<cbuf.length){
+                        int remainingIndex =0;
+                        for(int k=client.getBuffer().length-1;k>-1;k--){
+                          if(client.getBuffer()[k]!=null){
+                            remainingIndex=k+1;
                           }
                         }
+                        addToClientBuffer(data,remainingIndex);
+                        data=null;
+                        client.noData=true;
+                      }
+                      else {
+                        for (int i = 0; i < client.getBufferSize(); i++) {
+                          if (data.length != 0) {
+                            byte[] temp = new byte[cbuf.length];
+                            int p = 0;
+                            for (int y = 0; y < cbuf.length; y++) {
+                              if (y < cbuf.length && y <data.length) {
+                                temp[y] = data[y];
+                                p++;
+                              } else {
+                                break;
+                              }
+                            }
+                            if (data.length - cbuf.length > 0) {
+                              byte[] remaining = new byte[data.length - cbuf.length];
+                              for (int r = 0; r < remaining.length; r++) {
+                                remaining[r] = data[r + p];
+                              }
+                              data = new byte[remaining.length];
+                              data = remaining;
+                            }
+                            client.setBuffer(temp, i);
+                            cbuf = new byte[cbuf.length];
+                            client.noData = false;
+                          } else {
+                            client.noData = true;
+                            break;
+                          }
+                        }
+                      }
                     }
                     System.gc();
                 }else{
-                    Client.noData=true;
+                    client.noData=true;
                     return;
 //                    break;
                 }
@@ -75,9 +82,20 @@ public class ClientProcessData extends Thread {
         }
 
     }
-
-    public void setOffset(){
-        offset=offset+(Client.getBufferSize()*10);
-//        offset=offset+(ClientModule.getBufferSize()*ClientModule.getServer().getServer_mss());
+  private boolean clientBufferEmpty(){
+    boolean empty=false;
+    for (byte[] entry : client.getBuffer()) {
+      if (entry != null) {
+        empty = false;
+        break;
+      } else {
+        empty = true;
+      }
     }
+    return empty;
+  }
+  private void addToClientBuffer(byte[] dataPortion, int index){
+    client.setBuffer(dataPortion,index);
+  }
+
 }

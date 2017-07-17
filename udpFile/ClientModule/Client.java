@@ -7,117 +7,81 @@ import java.net.InetAddress;
  */
 public class Client {
 
-  private static int windowSize;
-  private static int mss;
-  private static int maxWaitingTime;
-  private static int seqNumber;
-  private static int keepAliveInterval;
-  private static ClientServerConfiguration server;
-  private static byte[] incomingBuffer;
-  private static byte[] outgoingBuffer;
-  public static byte[][] window;
-  private static char[][] buffer;
-  private static String sessionID;
-  public static boolean noData;
-//  public static Map<Integer,byte[]> buffer; //seqNum n bytes
-//  private static long sentTime;
-//  private Queue<String> buffer;
+  private int maxStreamSize;
+  private int mss;
+  private int maxWaitingTime;
+  private int seqNumber;
+  private int keepAliveInterval;
+  private ClientServerConfiguration server;
+  private byte[][] window;
+  private byte[][] buffer;
+  private String sessionID;
+  protected boolean noData;
 
   Client(int _mss, int _keepAliveInterval,int _window, int _server_port, InetAddress _server_address,int _waitingTime,int bufferSize,int numOfElementInWindow){
     mss=_mss;
     maxWaitingTime=_waitingTime;
     keepAliveInterval=_keepAliveInterval;
-    windowSize=_window;
-    incomingBuffer = new byte[windowSize];
-//    buffer = new LinkedList<String>();
+    maxStreamSize =_window;
     server = new ClientServerConfiguration(_server_port,_server_address);
-    outgoingBuffer = new byte[windowSize];
-    buffer = new char[bufferSize][];
-//    buffer = new HashMap<>();
+    buffer = new byte[bufferSize][];
     window = new byte[numOfElementInWindow][];
     noData=false;
   }
-  public static void setSessionID(String session){
+  protected void setSessionID(String session){
     sessionID = session;
   }
-  public static String getSessionID(){
+  protected String getSessionID(){
     return sessionID;
   }
-  public static void setBuffer(char[] data,int index){
-    buffer[index]= data;
+    public void setBuffer(byte[] data,int index){
+      buffer[index]= data;
   }
-  public static char[][] getBuffer(){
-    return buffer;
+  protected byte[][] getBuffer(){
+  return buffer;
   }
-  public static int getBufferSize(){
+  public int getBufferSize(){
     return buffer.length;
   }
-  public static int getWaitingTime(){
+  protected int getWaitingTime(){
     return maxWaitingTime;
   }
 
-//  public static void setWindow(String element){
-//  }
-//  public static String[] getWindow(){
-//    return window;
-//  }
-  public void makeConnection(){
+  protected void makeConnection(){
     ClientMakeConnection connection = new ClientMakeConnection(this,server);
     connection.connect();
   }
-  /*public static void setSentTime(long time){
-    sentTime = time;
-  }
-  public static long getSentTime(){
-    return sentTime;
-  }*/
-  public static void addOutgoingBuffer(byte[] msg) {
-//    buffer.put(Integer.parseInt(String.valueOf(msg).substring(12,18)),msg);
-    outgoingBuffer=msg;
-  }
-  public static void currentOutgoingMsg(byte[] msg){
-    outgoingBuffer=msg;
-  }
-  public static byte[] getOutgoingBuffer() {
-    return outgoingBuffer;
-  }
-  public static void clearOutgoingBuffer(int serverSeqNum){
-    outgoingBuffer = new byte[windowSize];
-//    buffer.remove(serverSeqNum);
-  }
-  public static void setSequenceNumber(int sequenceNumber){
+
+  protected void setSequenceNumber(int sequenceNumber){
     seqNumber=sequenceNumber;
   }
-  public static int getSequenceNumber(){
+  protected int getSequenceNumber(){
     return seqNumber;
   }
-  public static int getWindowSize(){
-    return windowSize;
+  protected int getMaxStreamSize(){
+    return maxStreamSize;
   }
-  public static int getMss(){
+  protected int getMss(){
     return mss;
   }
-  public static int getKeepAliveTimeInerval(){
+  protected int getKeepAliveTimeInerval(){
     return keepAliveInterval;
   }
-  public static ClientServerConfiguration getServer(){
+  protected ClientServerConfiguration getServer(){
     return server;
   }
-  public static byte[] getIncomingBuffer(){
-    return incomingBuffer;
+  protected void send(byte[] data){
+    try{
+      ClientProcessData clientProcessData= new ClientProcessData(data,this);
+      clientProcessData.start();
+    }catch (Exception e){
+      e.printStackTrace();
+    }
   }
-//  public void addToBuffer(String message){
-//    buffer.add(message);
-//  }
-//  public Queue<String> getBuffer(){
-//    return buffer;
-//  }
-//  public void setServer() throws Exception{
-//    server = new ClientServerConfiguration(9999,InetAddress.getLocalHost());
-//    server.setServer_sequenceNumber(6666);
-//    server.setServer_mss(100);
-//    server.setServer_timestamp(5000);
-//    server.setServer_windowSize(2);
-//
-//  }
+  protected byte[][] getWindow(){
+    return window;
+  }
+  protected void setWindow(int index, byte[] data){
+    window[index]=data;
+  }
 }

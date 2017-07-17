@@ -9,13 +9,16 @@ public class ClientSendKeepAlive extends Thread {
     private long time=0;
     private DatagramSocket datagramSocket;
     private udpFile.ClientModule.ClientSend clientSend;
-    ClientSendKeepAlive( DatagramSocket _datagramSocket){
+    private Client client;
+
+    ClientSendKeepAlive( DatagramSocket _datagramSocket,Client _client){
+      client=_client;
         datagramSocket=_datagramSocket;
-        clientSend = new udpFile.ClientModule.ClientSend(datagramSocket);
+        clientSend = new udpFile.ClientModule.ClientSend(datagramSocket,client);
     }
     public void run(){
-        while (Client.getServer().isAlive){
-            if((System.currentTimeMillis()-time)>=Client.getKeepAliveTimeInerval()){
+        while (client.getServer().getIsAlive()){
+            if((System.currentTimeMillis()-time)>=client.getKeepAliveTimeInerval()){
                 clientSend.sendKeepAlive();
                 time = System.currentTimeMillis();
             }
