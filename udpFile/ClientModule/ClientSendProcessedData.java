@@ -59,77 +59,7 @@ public class ClientSendProcessedData extends Thread {
                   resendCounter = 0;
                 }
 
-//                System.out.println("IS WINDOW EMPTY??? :" + isEmpty);
-//                System.out.println("Num of elements in window =" + numOfElementsInWindow);
-                if (numOfElementsInWindow < client.getWindow().length) {
-//                  System.out.println("BUFFER SIZE :- " + client.getBuffer().length);
-//                  System.out.println("INDEX :- " + index);
-                  if (index <= (client.getBufferSize() - 1)) {
-                    for (int i = 0; i <client.getWindow().length; i++) {
-//                      System.out.println("-------------round " + i + "-------------");
-                      if (((index + i) < client.getBufferSize()) && (client.getBuffer()[index + i] != null)) {
-                        int windowSize = 0;
-                        for (byte[] msg :client.getWindow()) {
-                          if (msg == null) {
-                            windowSize++;
-                          }
-                        }
-                        byte[] str = CreateMessage.createMsg(client.getSequenceNumber(),client.getServer().getServer_sequenceNumber(),
-                          0,windowSize,0,0,Long.parseLong(client.getSessionID()),client.getBuffer()[index + i]);
-                        System.out.println("message --> " + str);
-                        if (isEmpty) {
-                          System.out.println("Since window is empty : adding to widow's " + i + "th location");
-                          client.setWindow(i,str);
-                          client.setBuffer(null, (index + i));
-                          client.setSequenceNumber(client.getSequenceNumber() + 1);
-                          client.getServer().setServer_sequenceNumber(client.getServer().getServer_sequenceNumber() + 1);
-                          numOfElementsInWindow++;
-                        } else if ((numOfElementsInWindow + i) <client.getWindow().length) {
-                          System.out.println("Since window is NOT empty : adding to widow's " + numOfElementsInWindow + "th location");
-                          int indexEmpty = numOfElementsInWindow;
-                          for (int y = 0; y < client.getWindow().length; y++) {
-                            if (client.getWindow()[y] == null) {
-                              indexEmpty = y;
-                              System.out.println("Empty location-------" + y);
-                              break;
-                            }
-                          }
-                          client.setWindow(indexEmpty,str);
-                          client.setBuffer(null, (index + i));
-                          client.setSequenceNumber(client.getSequenceNumber() + 1);
-                          client.getServer().setServer_sequenceNumber(client.getServer().getServer_sequenceNumber() + 1);
-                          numOfElementsInWindow++;
-                        } else if ((numOfElementsInWindow + i) ==client.getWindow().length) {
-                          System.out.println("window is FUL");
-                          System.out.println("INDEX = " + index + " :: NUM_OF_ELEMENTS=" + numOfElementsInWindow + " ::");
-                          break;
-                        }
-                      } else if ((index + i) == client.getBufferSize()) {
-                        index = 0;
-                        break;
-                      }
-
-                    }
-                    for (int r = 0; r < client.getBuffer().length; r++) {
-                      if (client.getBuffer()[r] != null) {
-                        index = r;
-                        break;
-                      }
-                    }
-                    System.out.println("FINAL INDEX==" + index);
-                  }
-                } else if (numOfElementsInWindow ==client.getWindow().length) {
-                  System.out.println("in sending section where window is full");
-                  resendCounter++;
-                  System.out.println("resending for  =" + resendCounter + " th time");
-                  System.out.println("max resend count = "+maxResendCount);
-                  if (resendCounter < maxResendCount) {
-                    sendOutWindow();
-
-                  } else {
-//                    ClientModule.getServer().isAlive = false;
-                  }
-                }
+                processBuffer();
               }else{
                 sendFIN();
                 return;
@@ -164,6 +94,84 @@ public class ClientSendProcessedData extends Thread {
       datagramPacket = new DatagramPacket(msgByteArray, msgByteArray.length,
         client.getServer().getServer_address(), client.getServer().getServer_port());
       datagramSocket.send(datagramPacket);
+    }
+  }
+  private void processBuffer(){
+    try{
+
+    //                System.out.println("IS WINDOW EMPTY??? :" + isEmpty);
+//                System.out.println("Num of elements in window =" + numOfElementsInWindow);
+    if (numOfElementsInWindow < client.getWindow().length) {
+//                  System.out.println("BUFFER SIZE :- " + client.getBuffer().length);
+//                  System.out.println("INDEX :- " + index);
+      if (index <= (client.getBufferSize() - 1)) {
+        for (int i = 0; i <client.getWindow().length; i++) {
+//                      System.out.println("-------------round " + i + "-------------");
+          if (((index + i) < client.getBufferSize()) && (client.getBuffer()[index + i] != null)) {
+            int windowSize = 0;
+            for (byte[] msg :client.getWindow()) {
+              if (msg == null) {
+                windowSize++;
+              }
+            }
+            byte[] str = CreateMessage.createMsg(client.getSequenceNumber(),client.getServer().getServer_sequenceNumber(),
+              0,windowSize,0,0,Long.parseLong(client.getSessionID()),client.getBuffer()[index + i]);
+            System.out.println("message --> " + str);
+            if (isEmpty) {
+              System.out.println("Since window is empty : adding to widow's " + i + "th location");
+              client.setWindow(i,str);
+              client.setBuffer(null, (index + i));
+              client.setSequenceNumber(client.getSequenceNumber() + 1);
+              client.getServer().setServer_sequenceNumber(client.getServer().getServer_sequenceNumber() + 1);
+              numOfElementsInWindow++;
+            } else if ((numOfElementsInWindow + i) <client.getWindow().length) {
+              System.out.println("Since window is NOT empty : adding to widow's " + numOfElementsInWindow + "th location");
+              int indexEmpty = numOfElementsInWindow;
+              for (int y = 0; y < client.getWindow().length; y++) {
+                if (client.getWindow()[y] == null) {
+                  indexEmpty = y;
+                  System.out.println("Empty location-------" + y);
+                  break;
+                }
+              }
+              client.setWindow(indexEmpty,str);
+              client.setBuffer(null, (index + i));
+              client.setSequenceNumber(client.getSequenceNumber() + 1);
+              client.getServer().setServer_sequenceNumber(client.getServer().getServer_sequenceNumber() + 1);
+              numOfElementsInWindow++;
+            } else if ((numOfElementsInWindow + i) ==client.getWindow().length) {
+              System.out.println("window is FUL");
+              System.out.println("INDEX = " + index + " :: NUM_OF_ELEMENTS=" + numOfElementsInWindow + " ::");
+              break;
+            }
+          } else if ((index + i) == client.getBufferSize()) {
+            index = 0;
+            break;
+          }
+
+        }
+        for (int r = 0; r < client.getBuffer().length; r++) {
+          if (client.getBuffer()[r] != null) {
+            index = r;
+            break;
+          }
+        }
+        System.out.println("FINAL INDEX==" + index);
+      }
+    } else if (numOfElementsInWindow ==client.getWindow().length) {
+      System.out.println("in sending section where window is full");
+      resendCounter++;
+      System.out.println("resending for  =" + resendCounter + " th time");
+      System.out.println("max resend count = "+maxResendCount);
+      if (resendCounter < maxResendCount) {
+        sendOutWindow();
+
+      } else {
+//                    ClientModule.getServer().isAlive = false;
+      }
+    }
+    }catch (Exception ex){
+      ex.printStackTrace();
     }
   }
   private void processRemainingBuffer(){

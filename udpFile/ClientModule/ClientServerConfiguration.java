@@ -32,9 +32,6 @@ public class ClientServerConfiguration {
   protected int getServerPort(){
     return server_port;
   }
-  protected long getkeepAliveTime(){
-    return keepAliveTime;
-  }
   protected void setIsAlive(boolean alive){
     isAlive=alive;
   }

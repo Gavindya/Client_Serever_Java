@@ -17,6 +17,8 @@ public class Client {
   private byte[][] buffer;
   private String sessionID;
   protected boolean noData;
+  private Window clientWindow;
+  private Buffer clientBuffer;
 
   Client(int _mss, int _keepAliveInterval,int _window, int _server_port, InetAddress _server_address,int _waitingTime,int bufferSize,int numOfElementInWindow){
     mss=_mss;
@@ -27,6 +29,14 @@ public class Client {
     buffer = new byte[bufferSize][];
     window = new byte[numOfElementInWindow][];
     noData=false;
+    clientBuffer=new Buffer(bufferSize);
+    clientWindow=new Window(numOfElementInWindow);
+  }
+  protected Buffer getClientBuffer(){
+    return clientBuffer;
+  }
+  protected Window getClientWindow(){
+    return clientWindow;
   }
   protected void setSessionID(String session){
     sessionID = session;
