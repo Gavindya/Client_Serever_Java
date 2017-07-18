@@ -22,6 +22,7 @@ public class ClientProcessData extends Thread {
                 if(client.getServer().getIsAlive()){
                   cbuf = new byte[client.getServer().getServer_mss()-25];
                    isEmpty=clientBufferEmpty();
+//                  isEmpty=client.getClientBuffer().isBufferEmpty();
                     if (isEmpty) {
                       System.out.println("");
                       if(data==null|| data.length==0){
@@ -36,6 +37,8 @@ public class ClientProcessData extends Thread {
                           }
                         }
                         addToClientBuffer(data,remainingIndex);
+//                        int remainingIndex = client.getClientBuffer().getRemainingIndex();
+//                        client.getClientBuffer().addToBuffer(remainingIndex,data);
                         data=null;
                         client.noData=true;
                       }
@@ -60,6 +63,7 @@ public class ClientProcessData extends Thread {
                               data = new byte[remaining.length];
                               data = remaining;
                             }
+//                            client.getClientBuffer().addToBuffer(i,temp);
                             client.setBuffer(temp, i);
                             cbuf = new byte[cbuf.length];
                             client.noData = false;

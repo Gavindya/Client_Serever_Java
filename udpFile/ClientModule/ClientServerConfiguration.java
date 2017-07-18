@@ -35,24 +35,24 @@ public class ClientServerConfiguration {
   protected void setIsAlive(boolean alive){
     isAlive=alive;
   }
-  public void setServer_windowSize(int windowSize){
+  protected void setServer_windowSize(int windowSize){
     server_windowSize=windowSize;
   }
-  public void setServer_mss(int mss){
+  protected void setServer_mss(int mss){
     server_mss=mss;
   }
-  public void setServer_timestamp(int timestamp){
+  protected void setServer_timestamp(int timestamp){
     server_timestamp=timestamp;
   }
-  public int getServer_windowSize(){return server_windowSize;}
-  public int getServer_mss(){return server_mss;}
-  public int getServer_timestamp(){return server_timestamp;}
-  public int getServer_sequenceNumber(){return server_sequenceNumber;}
-  public int getServer_port(){return server_port;}
-  public InetAddress getServer_address(){
+  protected int getServer_windowSize(){return server_windowSize;}
+  protected int getServer_mss(){return server_mss;}
+  protected int getServer_timestamp(){return server_timestamp;}
+  protected int getServer_sequenceNumber(){return server_sequenceNumber;}
+  protected int getServer_port(){return server_port;}
+  protected InetAddress getServer_address(){
     return server_address;
   }
-  public long getKeepAliveTime(){
+  protected long getKeepAliveTime(){
     return keepAliveTime;
   }
 }

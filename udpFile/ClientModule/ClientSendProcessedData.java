@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Map;
 
 /**
  * Created by Gavindya Jayawardena on 7/9/2017.
@@ -43,6 +44,7 @@ public class ClientSendProcessedData extends Thread {
               else if( !client.noData){
                 Thread.sleep(500);
   //                Thread.sleep(ClientModule.getServer().getServer_timestamp());
+//                numOfElementsInWindow = client.getClientWindow().getNumberOfElements();
                 numOfElementsInWindow = 0;
                 for (int p = 0; p < client.getWindow().length; p++) {
                   if (client.getWindow()[p] != null) {
@@ -51,6 +53,7 @@ public class ClientSendProcessedData extends Thread {
                 }
                 if (numOfElementsInWindow > 0) {
                   isEmpty = false;
+//                  if (numOfElementsInWindow <client.getClientWindow().getWindowSize()) {
                   if (numOfElementsInWindow <client.getWindow().length) {
                     resendCounter = 0;
                   }
@@ -58,7 +61,16 @@ public class ClientSendProcessedData extends Thread {
                   isEmpty = true;
                   resendCounter = 0;
                 }
-
+//                Map<String,Integer> results = client.getClientWindow().processBuffer(index, client.getClientBuffer(), client.getSequenceNumber()
+//                  , client.getServer().getServer_sequenceNumber(),client.getSessionID(),resendCounter);
+//                if(results.containsKey("resendCounter")){
+//                  resendCounter=results.get("resendCounter");
+//                  client.setSequenceNumber(results.get("clientSequence"));
+//                  client.getServer().setServer_sequenceNumber(results.get("serverSequence"));
+//                    if(resendCounter < maxResendCount) {
+//                      sendOutWindow();
+//                    }
+//                }
                 processBuffer();
               }else{
                 sendFIN();
@@ -72,6 +84,7 @@ public class ClientSendProcessedData extends Thread {
     }
 
   public void sendOutWindow() throws Exception{
+//        for(byte[] msgInWindow : client.getClientWindow().getWindow()){
         for(byte[] msgInWindow : client.getWindow()){
             System.out.println("MSG-->"+msgInWindow);
           DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(msgInWindow,0, msgInWindow.length));
@@ -101,6 +114,7 @@ public class ClientSendProcessedData extends Thread {
 
     //                System.out.println("IS WINDOW EMPTY??? :" + isEmpty);
 //                System.out.println("Num of elements in window =" + numOfElementsInWindow);
+//  if (numOfElementsInWindow < client.getClientWindow().getWindowSize()) {
     if (numOfElementsInWindow < client.getWindow().length) {
 //                  System.out.println("BUFFER SIZE :- " + client.getBuffer().length);
 //                  System.out.println("INDEX :- " + index);
@@ -177,6 +191,7 @@ public class ClientSendProcessedData extends Thread {
   private void processRemainingBuffer(){
     try{
       int clientBuffRemaining = client.getBuffer().length - 1;
+//      int clientBuffRemaining = client.getClientBuffer().getRemainingIndex();
       for (int x = client.getBuffer().length - 1; x > -1; x--) {
         if (client.getBuffer()[x] != null) {
           clientBuffRemaining = x;
@@ -184,6 +199,7 @@ public class ClientSendProcessedData extends Thread {
         }
       }
       numOfElementsInWindow=0;
+//      numOfElementsInWindow=client.getClientWindow().getNumberOfElements();
       for(int p=0;p<client.getWindow().length;p++){
         if(client.getWindow()[p]!=null){
           numOfElementsInWindow++;
@@ -191,10 +207,10 @@ public class ClientSendProcessedData extends Thread {
       }
       if(numOfElementsInWindow==client.getWindow().length){
         sendOutWindow();
-
       }
       Thread.sleep(1000);
       int indexEmpty=0;
+//      int indexEmpty=client.getClientWindow().getEmptyIndex();
       for(int y=0;y<client.getWindow().length;y++){
         if(client.getWindow()[y]==null){
           indexEmpty=y;
@@ -203,6 +219,7 @@ public class ClientSendProcessedData extends Thread {
       }
 
       int winSize = 0;
+//      int winSize = client.getClientWindow().getWindowSize()-client.getClientWindow().getNumberOfElements();
       for (byte[] msg :client.getWindow()) {
         if (msg == null) {
           winSize++;
@@ -211,8 +228,10 @@ public class ClientSendProcessedData extends Thread {
       byte[] dataMsg = CreateMessage.createMsg(client.getSequenceNumber(),client.getServer().getServer_sequenceNumber(),
         0,winSize,0,0,Long.parseLong(client.getSessionID()),client.getBuffer()[clientBuffRemaining]);
 
+//      client.getClientWindow().setWindow(indexEmpty,dataMsg);
       client.setWindow(indexEmpty,dataMsg);
       numOfElementsInWindow++;
+//      client.getClientBuffer().addToBuffer(clientBuffRemaining,null);
       client.setBuffer(null,clientBuffRemaining);
       client.setSequenceNumber(client.getSequenceNumber()+1);
       client.getServer().setServer_sequenceNumber(client.getServer().getServer_sequenceNumber()+1);

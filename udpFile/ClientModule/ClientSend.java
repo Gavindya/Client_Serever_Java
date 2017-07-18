@@ -34,11 +34,14 @@ public class ClientSend extends Thread {
 
   protected void sendACK(InetAddress serverAddr, int portNum,int seq,int ack) {
     try{
-//    private byte[] createMsg(int sequenceNumber,int serverSequence,int control,int windowSize,int mss,int keepAliveTime, long sessionID) {
-      byte[] syn = CreateMessage.createMsg(seq,ack,4,client.getWindow().length,0,0,Long.parseLong(client.getSessionID()),null);
-      datagramPacket = new DatagramPacket(syn, syn.length, serverAddr, portNum);
-      datagramSocket.send(datagramPacket);
-      System.out.println("SENT ACK");
+
+//      byte[] ack_msg = CreateMessage.createMsg(seq,ack,4,client.getClientWindow().getWindowSize(),0,0,Long.parseLong(client.getSessionID()),null);
+      byte[] ack_msg = CreateMessage.createMsg(seq,ack,4,client.getWindow().length,0,0,Long.parseLong(client.getSessionID()),null);
+      if(ack_msg!=null){
+        datagramPacket = new DatagramPacket(ack_msg, ack_msg.length, serverAddr, portNum);
+        datagramSocket.send(datagramPacket);
+        System.out.println("SENT ACK");
+      }
     }catch (Exception ex){
       System.out.println(ex.getMessage());
     }

@@ -126,6 +126,7 @@ public class ClientProcessIncomingMessage implements Runnable {
   private void clearWindowCell(){
     try{
       if(String.valueOf(sessionID).equals(client.getSessionID())){
+//        client.getClientWindow().clearWindowCell(serverSequence);
         for(int i =0;i<client.getWindow().length;i++){
           if(client.getWindow()[i]!=null ){
             ByteArrayInputStream bis = new ByteArrayInputStream(client.getWindow()[i]);
